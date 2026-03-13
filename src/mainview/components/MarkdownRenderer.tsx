@@ -11,9 +11,9 @@ function isMermaid(className: string | undefined): boolean {
 	return /\blanguage-mermaid\b/.test(className || "");
 }
 
-export default function MarkdownRenderer({ content }: { content: string }) {
+export default function MarkdownRenderer({ content, className }: { content: string; className?: string }) {
 	return (
-		<div className="artifact-markdown">
+		<div className={className}>
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm, remarkMath]}
 				rehypePlugins={[

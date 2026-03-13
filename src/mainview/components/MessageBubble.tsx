@@ -1,6 +1,5 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import type { ArtifactSummary, ChatMessage } from "../../shared/view-rpc";
+import MarkdownRenderer from "./MarkdownRenderer";
 
 export default function MessageBubble({
 	message,
@@ -31,7 +30,7 @@ export default function MessageBubble({
 						: "text-[12.5px] leading-6 text-[var(--text-primary)]"
 				}`}
 			>
-				<ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+				<MarkdownRenderer content={message.content} />
 			</div>
 			{message.artifactIds.length > 0 && (
 				<div className="mt-2.5 flex flex-wrap gap-1.5">

@@ -53,7 +53,7 @@ export default function ArtifactDetailPane({
 						) : activeArtifact.kind === "video" ? (
 							<video src={(activeArtifact as any).previewUrl} controls className="max-w-full rounded-lg" />
 						) : activeArtifact.kind === "markdown" ? (
-							<MarkdownRenderer content={(activeArtifact as any).content} />
+							<MarkdownRenderer content={(activeArtifact as any).content} className="artifact-markdown" />
 						) : (
 							<pre className="whitespace-pre-wrap text-[14px] leading-7 text-[var(--text-primary)]">
 								{(activeArtifact as any).content}

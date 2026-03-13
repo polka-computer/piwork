@@ -63,7 +63,7 @@ export default function ArtifactModal({
 						) : artifact.kind === "video" ? (
 							<video src={(artifact as any).previewUrl} controls className="max-w-full rounded-lg" />
 						) : artifact.kind === "markdown" ? (
-							<MarkdownRenderer content={(artifact as any).content} />
+							<MarkdownRenderer content={(artifact as any).content} className="artifact-markdown" />
 						) : (
 							<pre className="whitespace-pre-wrap text-[13px] leading-6 text-[var(--text-primary)]">
 								{(artifact as any).content}
