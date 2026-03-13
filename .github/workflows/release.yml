@@ -59,7 +59,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     env:
       RELEASE_ENV: stable
-      RELEASE_BASE_URL: ${{ (startsWith(github.ref, 'refs/tags/v') || needs.auto-tag.outputs.should_build == 'true') && format('https://github.com/{0}/releases/latest/download', github.repository) || '' }}
+      RELEASE_BASE_URL: https://github.com/${{ github.repository }}/releases/latest/download
       ELECTROBUN_DEVELOPER_ID: ${{ secrets.ELECTROBUN_DEVELOPER_ID }}
       ELECTROBUN_TEAMID: ${{ secrets.ELECTROBUN_TEAMID }}
       ELECTROBUN_APPLEID: ${{ secrets.ELECTROBUN_APPLEID }}
