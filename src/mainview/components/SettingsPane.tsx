@@ -396,6 +396,9 @@ export default function SettingsPane({
 						</div>
 					)}
 				</div>
+				<p className="mt-4 pb-2 text-center text-[10px] text-[var(--text-dim)]">
+					{appInfo?.name ?? "piwork"} v{appInfo?.version ?? "0.0.0"} · {appInfo?.channel ?? "dev"}
+				</p>
 			</div>
 		</div>
 	);

@@ -337,6 +337,7 @@ export interface PiworkViewRPCSchema {
 		messages: {
 			ompEvent: OmpStreamEvent;
 			updateStatus: UpdateStatusEntry;
+			updateAvailableNotification: { version: string };
 		};
 	};
 }

@@ -5,6 +5,7 @@ import { installApplicationMenu } from "./application-menu";
 import { startArtifactWatcher } from "./artifact-watcher";
 import { createChatRunner } from "./chat-runner";
 import { ensurePiworkDir } from "./ensure-piwork-dir";
+import { startAutoUpdateChecker } from "./auto-update-checker";
 import { createMainviewRpc } from "./mainview-rpc";
 import { PIWORK_OBJECTS_DIR } from "./piwork-paths";
 import * as store from "./piwork-store";
@@ -62,6 +63,12 @@ rpc = createMainviewRpc({
 
 Updater.onStatusChange?.((entry) => {
 	rpc.send.updateStatus(entry as UpdateStatusEntry);
+});
+
+startAutoUpdateChecker({
+	onUpdateFound: (version) => {
+		rpc.send.updateAvailableNotification({ version });
+	},
 });
 
 await ensurePiworkDir();

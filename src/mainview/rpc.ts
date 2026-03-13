@@ -166,3 +166,13 @@ export const addUpdateStatusListenerViaBun = (
 		bridge.removeMessageListener("updateStatus", listener);
 	};
 };
+
+export const addUpdateAvailableListenerViaBun = (
+	listener: (event: { version: string }) => void,
+): (() => void) => {
+	const bridge = ensureBridge();
+	bridge.addMessageListener("updateAvailableNotification", listener);
+	return () => {
+		bridge.removeMessageListener("updateAvailableNotification", listener);
+	};
+};

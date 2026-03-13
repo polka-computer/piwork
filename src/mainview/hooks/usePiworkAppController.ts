@@ -25,6 +25,7 @@ import {
 import type { ComposerSubmitInput } from "../components/ChatComposer";
 import {
 	addOmpEventListenerViaBun,
+	addUpdateAvailableListenerViaBun,
 	addUpdateStatusListenerViaBun,
 	getChatViaBun,
 	getArtifactViaBun,
@@ -95,6 +96,7 @@ export function usePiworkAppController() {
 
 	const runtimeActivityRef = useRef<Record<string, ChatRuntimeActivity>>({});
 	const runtimeCleanupTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+	const lastNotifiedVersionRef = useRef<string | null>(null);
 	const [isInitializing, setIsInitializing] = useState(false);
 
 	const dashboard = dashboardQuery.data ?? null;
@@ -227,6 +229,21 @@ export function usePiworkAppController() {
 			);
 		});
 	}, [bridgeAvailable, dispatch, queryClient]);
+
+	useEffect(() => {
+		if (!bridgeAvailable) return;
+		return addUpdateAvailableListenerViaBun(({ version }) => {
+			if (lastNotifiedVersionRef.current === version) return;
+			lastNotifiedVersionRef.current = version;
+			void refreshAppInfo();
+			toast(`Update available: v${version}`, {
+				action: {
+					label: "Settings",
+					onClick: () => dispatch({ type: "set_active_view", value: "settings" }),
+				},
+			});
+		});
+	}, [bridgeAvailable, refreshAppInfo, dispatch]);
 
 	useEffect(() => {
 		if (!bridgeAvailable) return;
