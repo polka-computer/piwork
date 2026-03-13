@@ -19,7 +19,7 @@ jobs:
       should_build: ${{ steps.check.outputs.should_build }}
       tag_name: ${{ steps.check.outputs.tag_name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check and create tag
         id: check
@@ -51,8 +51,6 @@ jobs:
         include:
           - runner: macos-14
             label: macos-arm64
-          - runner: macos-13
-            label: macos-x64
           - runner: windows-latest
             label: win-x64
           - runner: ubuntu-latest
@@ -68,7 +66,23 @@ jobs:
       ELECTROBUN_APPLEIDPASS: ${{ secrets.ELECTROBUN_APPLEIDPASS }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+
+      - name: Install Apple certificate
+        if: runner.os == 'macOS'
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          CERT_PATH=$RUNNER_TEMP/cert.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          echo -n "$APPLE_CERTIFICATE" | base64 --decode -o $CERT_PATH
+          security create-keychain -p "" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "" $KEYCHAIN_PATH
+          security import $CERT_PATH -P "$APPLE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "" $KEYCHAIN_PATH
+          security list-keychains -d user -s $KEYCHAIN_PATH login.keychain-db
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -95,7 +109,7 @@ jobs:
         run: bun run build:stable
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: piwork-${{ matrix.label }}-${{ env.RELEASE_ENV }}
           path: artifacts/
@@ -111,7 +125,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: release-artifacts
           merge-multiple: true
