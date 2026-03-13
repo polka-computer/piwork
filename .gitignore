@@ -4,6 +4,7 @@ build
 artifacts
 native
 .DS_Store
+Icon?
 *.log
 .env
 .env.local
