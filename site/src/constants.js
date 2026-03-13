@@ -1,9 +1,10 @@
 export const VERSION = '0.1.0'
 
 export const LINKS = {
-  github: 'https://github.com/nichochar/piwork',
-  issues: 'https://github.com/nichochar/piwork/issues',
-  releases: 'https://github.com/nichochar/piwork/releases',
+  github: 'https://github.com/polka-computer/piwork',
+  issues: 'https://github.com/polka-computer/piwork/issues',
+  releases: 'https://github.com/polka-computer/piwork/releases',
+  dmg: 'https://github.com/polka-computer/piwork/releases/latest/download/stable-macos-arm64-piwork.dmg',
   openRouter: 'https://openrouter.ai',
   twitter: 'https://x.com/Jonovono',
 }

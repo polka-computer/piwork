@@ -44,7 +44,7 @@ function Hero() {
           <span className="hero-dim">Powered by Oh My Pi.</span>
         </p>
         <div className="hero-actions">
-          <a href={LINKS.releases} className="btn btn-lg" target="_blank" rel="noopener">
+          <a href={LINKS.dmg} className="btn btn-lg" target="_blank" rel="noopener">
             <span className="btn-icon">&darr;</span>
             Download for Mac
           </a>
@@ -390,7 +390,7 @@ function Download() {
           Download PiWork for free. Bring your API key and start getting things done.
         </p>
         <div className="download-buttons">
-          <a href={LINKS.releases} className="btn btn-xl" target="_blank" rel="noopener">
+          <a href={LINKS.dmg} className="btn btn-xl" target="_blank" rel="noopener">
             <span className="btn-icon">&darr;</span>
             Download for macOS
           </a>

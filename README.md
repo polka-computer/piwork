@@ -6,7 +6,7 @@ Built with [Electrobun](https://electrobun.dev) + React + Bun. Runs on macOS, Wi
 
 ## Download
 
-Grab the latest release for your platform from [GitHub Releases](https://github.com/nichochar/piwork/releases).
+Grab the latest release for your platform from [GitHub Releases](https://github.com/polka-computer/piwork/releases).
 
 ## Development
 
