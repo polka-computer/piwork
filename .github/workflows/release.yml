@@ -1,0 +1,123 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  auto-tag:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.check.outputs.should_build }}
+      tag_name: ${{ steps.check.outputs.tag_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check and create tag
+        id: check
+        run: |
+          VERSION=$(jq -r .version package.json)
+          TAG="v${VERSION}"
+          echo "tag_name=${TAG}" >> "$GITHUB_OUTPUT"
+
+          if git ls-remote --tags origin "refs/tags/${TAG}" | grep -q "${TAG}"; then
+            echo "Tag ${TAG} already exists, skipping"
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Creating tag ${TAG}"
+            git tag "${TAG}"
+            git push origin "${TAG}"
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: [auto-tag]
+    if: |
+      always() &&
+      (startsWith(github.ref, 'refs/tags/v') ||
+       needs.auto-tag.outputs.should_build == 'true' ||
+       github.event_name == 'workflow_dispatch')
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            label: macos-arm64
+          - runner: macos-13
+            label: macos-x64
+          - runner: windows-latest
+            label: win-x64
+          - runner: ubuntu-latest
+            label: linux-x64
+
+    runs-on: ${{ matrix.runner }}
+    env:
+      RELEASE_ENV: stable
+      RELEASE_BASE_URL: ${{ (startsWith(github.ref, 'refs/tags/v') || needs.auto-tag.outputs.should_build == 'true') && format('https://github.com/{0}/releases/latest/download', github.repository) || '' }}
+      ELECTROBUN_DEVELOPER_ID: ${{ secrets.ELECTROBUN_DEVELOPER_ID }}
+      ELECTROBUN_TEAMID: ${{ secrets.ELECTROBUN_TEAMID }}
+      ELECTROBUN_APPLEID: ${{ secrets.ELECTROBUN_APPLEID }}
+      ELECTROBUN_APPLEIDPASS: ${{ secrets.ELECTROBUN_APPLEIDPASS }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Linux system packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            pkg-config \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build release artifacts
+        shell: bash
+        run: bun run build:stable
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: piwork-${{ matrix.label }}-${{ env.RELEASE_ENV }}
+          path: artifacts/
+          if-no-files-found: error
+
+  publish:
+    needs: [auto-tag, build]
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      (startsWith(github.ref, 'refs/tags/v') ||
+       needs.auto-tag.outputs.should_build == 'true')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Publish GitHub release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || needs.auto-tag.outputs.tag_name }}
+          files: release-artifacts/**

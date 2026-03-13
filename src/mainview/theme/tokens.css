@@ -1,0 +1,65 @@
+:root {
+	color-scheme: dark;
+
+	/* Canvas and chrome */
+	--bg-canvas: #09080d;
+	--bg-sidebar: #0d0a12;
+	--bg-panel: rgba(111, 96, 190, 0.055);
+	--bg-panel-strong: rgba(125, 110, 212, 0.095);
+	--bg-panel-active: rgba(101, 87, 178, 0.18);
+	--border-soft: rgba(255, 255, 255, 0.06);
+	--border-strong: rgba(124, 109, 206, 0.34);
+
+	/* Typography */
+	--text-primary: #f3eee8;
+	--text-muted: #b7adb4;
+	--text-dim: #7b7280;
+
+	/* Warm crust accent */
+	--accent: #d6a45c;
+	--accent-strong: #ebbf77;
+	--accent-foreground: #1a1208;
+
+	/* Berry-indigo accent surfaces */
+	--berry: #6b5fd4;
+	--berry-strong: #9086ef;
+	--berry-blue: #5674dc;
+	--berry-deep: #221931;
+	--berry-surface: rgba(101, 87, 178, 0.18);
+	--berry-surface-strong: rgba(118, 102, 205, 0.24);
+	--berry-border: rgba(132, 118, 219, 0.38);
+
+	/* Shared semantic aliases */
+	--accent-surface: var(--berry-surface);
+	--accent-surface-strong: var(--berry-surface-strong);
+
+	/* Status tones */
+	--status-review-label: #e1c483;
+
+	--status-draft-dot: var(--berry-blue);
+	--status-draft-label: #aac1ff;
+
+	--status-running-dot: #748bf0;
+	--status-running-border: #4455a3;
+	--status-running-bg: #151b31;
+	--status-running-text: #d3ddff;
+	--status-running-label: #b6c6ff;
+
+	--status-completed-dot: #847ab9;
+	--status-completed-label: #aca3cf;
+
+	--status-archived-dot: #615c72;
+	--status-archived-label: #8c859d;
+
+	/* Danger */
+	--danger: #ff8d95;
+	--danger-border: #6e2f3c;
+	--danger-surface: #291319;
+	--danger-strong: #f4b2b8;
+
+	/* Overlays */
+	--overlay-panel: #0d0d13;
+	--overlay-menu: #12111a;
+
+	--font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
