@@ -95,6 +95,7 @@ export default function ChatComposer({
 	const [attachments, setAttachments] = useState<Attachment[]>([]);
 	const [mentionedArtifacts, setMentionedArtifacts] = useState<ArtifactSummary[]>([]);
 	const [modelLoadError, setModelLoadError] = useState<string | undefined>();
+	const [mentionSelectedIndex, setMentionSelectedIndex] = useState(0);
 	const promptRef = useRef<HTMLTextAreaElement>(null);
 	const pickerRef = useRef<HTMLDivElement>(null);
 	const pickerInputRef = useRef<HTMLInputElement>(null);
@@ -134,16 +135,36 @@ export default function ChatComposer({
 		};
 	}, [modelPickerOpen]);
 
-	useEffect(() => {
-		if (!mentionPickerOpen) return;
-		const handleKey = (event: KeyboardEvent) => {
-			if (event.key === "Escape") setMentionPickerOpen(false);
-		};
-		document.addEventListener("keydown", handleKey);
-		return () => {
-			document.removeEventListener("keydown", handleKey);
-		};
-	}, [mentionPickerOpen]);
+	const selectMentionItem = (item: MentionItem) => {
+		if (item.type === "workspace") {
+			insertWorkspaceMention(item.workspace.alias);
+		} else {
+			addMentionedArtifact(item.artifact);
+		}
+	};
+
+	const handleMentionKeyDown = (event: React.KeyboardEvent) => {
+		switch (event.key) {
+			case "ArrowDown":
+				event.preventDefault();
+				setMentionSelectedIndex((i) => Math.min(i + 1, mentionItems.length - 1));
+				break;
+			case "ArrowUp":
+				event.preventDefault();
+				setMentionSelectedIndex((i) => Math.max(i - 1, 0));
+				break;
+			case "Enter":
+				event.preventDefault();
+				if (clampedIndex >= 0 && mentionItems[clampedIndex]) {
+					selectMentionItem(mentionItems[clampedIndex]);
+				}
+				break;
+			case "Escape":
+				event.preventDefault();
+				setMentionPickerOpen(false);
+				break;
+		}
+	};
 
 	useEffect(() => {
 		if (!modelPickerOpen) return;
@@ -154,6 +175,7 @@ export default function ChatComposer({
 	useEffect(() => {
 		if (!mentionPickerOpen) return;
 		setMentionQuery("");
+		setMentionSelectedIndex(0);
 		queueMicrotask(() => mentionInputRef.current?.focus());
 	}, [mentionPickerOpen]);
 
@@ -178,6 +200,10 @@ export default function ChatComposer({
 			promptRef.current?.setSelectionRange(length, length);
 		});
 	}, [focusToken, isSending]);
+
+	useEffect(() => {
+		setMentionSelectedIndex(0);
+	}, [deferredMentionQuery]);
 
 	const selectedModelLabel = useMemo(() => {
 		if (!modelId) return "Auto";
@@ -213,6 +239,25 @@ export default function ChatComposer({
 			`${artifact.title} ${artifact.fileName} ${artifact.tags.join(" ")}`.toLowerCase().includes(query),
 		);
 	}, [artifacts, deferredMentionQuery]);
+
+	type MentionItem =
+		| { type: "workspace"; workspace: WorkspaceSummary }
+		| { type: "artifact"; artifact: ArtifactSummary };
+
+	const mentionItems = useMemo<MentionItem[]>(() => [
+		...filteredWorkspaces.map((workspace): MentionItem => ({ type: "workspace", workspace })),
+		...filteredArtifacts.map((artifact): MentionItem => ({ type: "artifact", artifact })),
+	], [filteredWorkspaces, filteredArtifacts]);
+
+	const clampedIndex = mentionItems.length > 0
+		? Math.min(mentionSelectedIndex, mentionItems.length - 1)
+		: -1;
+
+	useEffect(() => {
+		if (clampedIndex < 0 || !mentionPickerRef.current) return;
+		const el = mentionPickerRef.current.querySelector(`[data-mention-index="${clampedIndex}"]`);
+		el?.scrollIntoView({ block: "nearest" });
+	}, [clampedIndex]);
 
 	const rememberSelection = () => {
 		const element = promptRef.current;
@@ -572,6 +617,7 @@ export default function ChatComposer({
 								ref={mentionInputRef}
 								value={mentionQuery}
 								onChange={(event) => setMentionQuery(event.target.value)}
+								onKeyDown={handleMentionKeyDown}
 								placeholder="Search folders and artifacts..."
 								className="focus-ring mt-3 h-9 w-full rounded-xl border border-white/8 bg-white/[0.03] px-3 text-[12px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-dim)]"
 							/>
@@ -584,20 +630,30 @@ export default function ChatComposer({
 										Vault folders
 									</div>
 									<div className="flex flex-col gap-1">
-										{filteredWorkspaces.length > 0 ? filteredWorkspaces.map((workspace) => (
-											<button
-												key={workspace.id}
-												type="button"
-												onClick={() => insertWorkspaceMention(workspace.alias)}
-												className="flex items-center justify-between rounded-xl border border-white/6 bg-white/[0.02] px-3 py-2 text-left transition hover:bg-white/[0.04]"
-											>
-												<div className="min-w-0">
-													<div className="text-[12px] font-medium text-[var(--text-primary)]">@{workspace.alias}</div>
-													<div className="mt-0.5 truncate text-[10px] text-[var(--text-dim)]">{workspace.path}</div>
-												</div>
-												<span className="text-[10px] text-[var(--text-dim)]">{workspace.fileCount} files</span>
-											</button>
-										)) : (
+										{filteredWorkspaces.length > 0 ? filteredWorkspaces.map((workspace, wi) => {
+											const flatIndex = wi;
+											const highlighted = flatIndex === clampedIndex;
+											return (
+												<button
+													key={workspace.id}
+													type="button"
+													data-mention-index={flatIndex}
+													onClick={() => insertWorkspaceMention(workspace.alias)}
+													onMouseEnter={() => setMentionSelectedIndex(flatIndex)}
+													className={`flex items-center justify-between rounded-xl border px-3 py-2 text-left transition ${
+														highlighted
+															? "border-[var(--accent)]/30 bg-white/[0.06]"
+															: "border-white/6 bg-white/[0.02] hover:bg-white/[0.04]"
+													}`}
+												>
+													<div className="min-w-0">
+														<div className="text-[12px] font-medium text-[var(--text-primary)]">@{workspace.alias}</div>
+														<div className="mt-0.5 truncate text-[10px] text-[var(--text-dim)]">{workspace.path}</div>
+													</div>
+													<span className="text-[10px] text-[var(--text-dim)]">{workspace.fileCount} files</span>
+												</button>
+											);
+										}) : (
 											<div className="rounded-xl border border-white/6 bg-white/[0.02] px-3 py-3 text-[11px] text-[var(--text-dim)]">
 												No indexed folders matched.
 											</div>
@@ -610,17 +666,23 @@ export default function ChatComposer({
 										Artifacts
 									</div>
 									<div className="flex flex-col gap-1">
-										{filteredArtifacts.length > 0 ? filteredArtifacts.map((artifact) => {
+										{filteredArtifacts.length > 0 ? filteredArtifacts.map((artifact, ai) => {
+											const flatIndex = filteredWorkspaces.length + ai;
+											const highlighted = flatIndex === clampedIndex;
 											const selected = mentionedArtifacts.some((entry) => entry.id === artifact.id);
 											return (
 												<button
 													key={artifact.id}
 													type="button"
+													data-mention-index={flatIndex}
 													onClick={() => addMentionedArtifact(artifact)}
+													onMouseEnter={() => setMentionSelectedIndex(flatIndex)}
 													className={`flex items-start justify-between rounded-xl border px-3 py-2 text-left transition ${
-														selected
-															? "border-[var(--border-strong)] bg-[var(--accent-surface)]"
-															: "border-white/6 bg-white/[0.02] hover:bg-white/[0.04]"
+														highlighted
+															? "border-[var(--accent)]/30 bg-white/[0.06]"
+															: selected
+																? "border-[var(--border-strong)] bg-[var(--accent-surface)]"
+																: "border-white/6 bg-white/[0.02] hover:bg-white/[0.04]"
 													}`}
 												>
 													<div className="min-w-0">

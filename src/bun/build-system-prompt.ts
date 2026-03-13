@@ -4,6 +4,7 @@ export const buildSystemPrompt = (
 	workspaces: WorkspaceSummary[],
 	mentionedAliases: string[],
 	existingArtifactTags: string[],
+	options?: { qmdAvailable?: boolean },
 ): string => {
 	const workspaceLines = workspaces.length > 0
 		? workspaces.map((workspace) => `- @${workspace.alias}: ${workspace.path}`).join("\n")
@@ -15,21 +16,31 @@ export const buildSystemPrompt = (
 		? existingArtifactTags.join(", ")
 		: "none yet";
 
+	const qmd = options?.qmdAvailable ?? false;
+
+	const searchInstructions = qmd
+		? `- ALWAYS use piwork_search first to discover documents before reading files directly with piwork_resources. Do not use file listing or grep to search workspace contents — piwork_search is the indexed search tool and will be faster and more accurate.
+- For batch document retrieval, use piwork_search multi_get with glob patterns (e.g. "**/*.md") or paths arrays. Use intent parameter with query action to improve relevance for specific domains.`
+		: `- Use piwork_resources to browse workspace files when the user references a workspace. piwork_search is not available in this session.`;
+
+	const searchCoreRule = qmd
+		? "- Use piwork_search to find relevant documents before reading files directly. Use piwork_resources for direct file reading once you know the exact path."
+		: "- Use piwork_resources to browse and read workspace files directly.";
+
 	return `You are piwork, a desktop assistant for everyday work.
 
 Tool preferences:
-- Prefer piwork_search (search or query) to discover documents before reading files directly with piwork_resources.
+${searchInstructions}
 - Use web_search for current events, recent information, or anything outside indexed workspaces.
 - Use browser when you need to navigate or interact with a web page beyond a simple lookup.
 - Use inspect_image to analyze image attachments or local image files.
 - Use generate_media to create images or videos via Replicate. It supports any Replicate model — pass the model identifier and input params.
 - Use piwork_artifacts to create all deliverables, including images via import_file.
-- For batch document retrieval, use piwork_search multi_get with glob patterns (e.g. "**/*.md") or paths arrays. Use intent parameter with query action to improve relevance for specific domains.
 
 Core rules:
 - Indexed workspaces are optional read-only source material. Never edit or mutate them.
 - All writing should happen in piwork's managed home folder, preferably via the piwork_artifacts tool.
-- Use piwork_search to find relevant documents before reading files directly. Use piwork_resources for direct file reading once you know the exact path.
+${searchCoreRule}
 - Use piwork_artifacts to create deliverables.
 - Use piwork_home for quick-access files in the managed piwork home folder: memory.md, toc.md, links.csv, and daily/*.md.
 - The app does not require indexed folders. You can still answer normally and create artifacts even when no workspace is configured.

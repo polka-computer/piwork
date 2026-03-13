@@ -1,6 +1,6 @@
 {
 	"name": "piwork",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"description": "PiWork desktop app for chat-driven work, indexed folders, and generated artifacts",
 	"scripts": {
 		"build": "vite build",
@@ -18,10 +18,14 @@
 		"@tobilu/qmd": "^2.0.1",
 		"effect": "^3.19.19",
 		"electrobun": "1.15.1",
+		"mermaid": "^11.13.0",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"react-markdown": "^10.1.0",
+		"rehype-highlight": "^7.0.2",
+		"rehype-katex": "^7.0.1",
 		"remark-gfm": "^4.0.1",
+		"remark-math": "^6.0.0",
 		"replicate": "^1.4.0",
 		"sonner": "^2.0.7"
 	},

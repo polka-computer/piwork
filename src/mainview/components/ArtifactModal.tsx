@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import type { ArtifactDetail } from "../../shared/view-rpc";
 import { showArtifactInFinderViaBun } from "../rpc";
 import ArtifactTagEditor from "./ArtifactTagEditor";
+import MarkdownRenderer from "./MarkdownRenderer";
 
 export default function ArtifactModal({
 	artifact,
@@ -24,7 +23,7 @@ export default function ArtifactModal({
 	}, [onClose]);
 
 	return createPortal(
-		<div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
+		<div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
 			<div className="flex h-[min(84vh,860px)] w-full max-w-[980px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[var(--overlay-panel)] shadow-2xl">
 				<div className="flex items-center justify-between border-b border-white/6 px-4 py-3">
 					<div className="min-w-0">
@@ -64,9 +63,7 @@ export default function ArtifactModal({
 						) : artifact.kind === "video" ? (
 							<video src={(artifact as any).previewUrl} controls className="max-w-full rounded-lg" />
 						) : artifact.kind === "markdown" ? (
-							<ReactMarkdown remarkPlugins={[remarkGfm]}>
-								{(artifact as any).content}
-							</ReactMarkdown>
+							<MarkdownRenderer content={(artifact as any).content} />
 						) : (
 							<pre className="whitespace-pre-wrap text-[13px] leading-6 text-[var(--text-primary)]">
 								{(artifact as any).content}

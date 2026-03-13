@@ -111,7 +111,7 @@ export const createChatRunner = (options: {
 					modelRegistry: registry,
 					modelId,
 					attachmentPaths,
-					systemPrompt: buildSystemPrompt(workspaces, mentionedAliases, existingArtifactTags),
+					systemPrompt: buildSystemPrompt(workspaces, mentionedAliases, existingArtifactTags, { qmdAvailable: options.qmdManager.isAvailable() }),
 					onEvent: options.sendOmpEvent,
 					customTools: [
 						piworkResourcesTool,

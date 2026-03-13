@@ -1,9 +1,8 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import type { ArtifactDetail } from "../../shared/view-rpc";
 import { formatDate } from "../app-shared";
 import { showArtifactInFinderViaBun } from "../rpc";
 import ArtifactTagEditor from "./ArtifactTagEditor";
+import MarkdownRenderer from "./MarkdownRenderer";
 
 export default function ArtifactDetailPane({
 	activeArtifact,
@@ -54,9 +53,7 @@ export default function ArtifactDetailPane({
 						) : activeArtifact.kind === "video" ? (
 							<video src={(activeArtifact as any).previewUrl} controls className="max-w-full rounded-lg" />
 						) : activeArtifact.kind === "markdown" ? (
-							<ReactMarkdown remarkPlugins={[remarkGfm]}>
-								{(activeArtifact as any).content}
-							</ReactMarkdown>
+							<MarkdownRenderer content={(activeArtifact as any).content} />
 						) : (
 							<pre className="whitespace-pre-wrap text-[14px] leading-7 text-[var(--text-primary)]">
 								{(activeArtifact as any).content}
