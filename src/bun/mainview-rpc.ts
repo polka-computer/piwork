@@ -163,8 +163,23 @@ export const createMainviewRpc = (options: {
 
 				checkForUpdate: async () => {
 					Updater.clearStatusHistory?.();
-					await Updater.checkForUpdate();
-					return options.getAppInfo();
+					const result = await Updater.checkForUpdate();
+					const appInfo = await options.getAppInfo();
+					// Electrobun bug: on network errors checkForUpdate returns a
+					// result object without writing it to the module-level updateInfo,
+					// so Updater.updateInfo() stays stale. Merge the returned result
+					// into the response so the UI always reflects the latest state.
+					if (result) {
+						appInfo.update = {
+							...appInfo.update,
+							version: result.version || appInfo.update.version,
+							hash: result.hash || appInfo.update.hash,
+							updateAvailable: result.updateAvailable || appInfo.update.updateAvailable,
+							updateReady: result.updateReady || appInfo.update.updateReady,
+							error: result.error || appInfo.update.error,
+						};
+					}
+					return appInfo;
 				},
 
 				downloadUpdate: async () => {

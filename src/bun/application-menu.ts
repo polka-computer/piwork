@@ -5,7 +5,7 @@ export const installApplicationMenu = (appName: string): void => {
 		{
 			label: appName,
 			submenu: [
-				{ label: `Quit ${appName}`, role: "quit" },
+				{ label: `Quit ${appName}`, role: "quit", accelerator: "CommandOrControl+Q" },
 			],
 		},
 		{
