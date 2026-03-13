@@ -119,7 +119,12 @@ jobs:
 
       - name: Build release artifacts
         shell: bash
-        run: bun run build:stable
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            bun run release:mac
+          else
+            bun run build:stable
+          fi
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
