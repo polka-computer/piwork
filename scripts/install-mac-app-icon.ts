@@ -95,21 +95,3 @@ copyFileSync(releaseAssetPaths.macIcnsPath, join(resourcesDir, "AppIcon.icns"));
 pruneAndSignMacNatives(bundlePath);
 
 console.log(`[piwork:release] finalized mac bundle resources in ${bundlePath}`);
-
-// Install QMD transitive dependencies inside the bundled copy
-const qmdDir = join(bundlePath, "Contents", "Resources", "app", "node_modules", "@tobilu", "qmd");
-if (existsSync(qmdDir)) {
-	console.log(`[piwork:release] installing QMD dependencies in ${qmdDir}`);
-	const qmdResult = spawnSync("bun", ["install", "--production"], {
-		cwd: qmdDir,
-		stdio: ["ignore", "pipe", "pipe"],
-	});
-	if (qmdResult.status === 0) {
-		console.log("[piwork:release] QMD dependencies installed successfully");
-	} else {
-		const stderr = qmdResult.stderr?.toString().trim();
-		console.warn(`[piwork:release] QMD dependency install failed (non-fatal): ${stderr}`);
-	}
-} else {
-	console.log("[piwork:release] QMD directory not found in bundle; skipping dependency install");
-}
