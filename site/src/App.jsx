@@ -6,15 +6,16 @@ function Nav() {
     <nav className="nav">
       <div className="nav-inner">
         <a href="#" className="nav-logo">
-          <img src="/icon.png" alt="PiWork" className="nav-icon" />
-          <span className="nav-name">PiWork</span>
+          <img src={import.meta.env.BASE_URL + 'icon.png'} alt="piwork" className="nav-icon" />
+          <span className="nav-name">piwork</span>
         </a>
         <div className="nav-links">
           <a href="#features">Features</a>
           <a href="#search">Search</a>
           <a href="#ai">AI</a>
           <a href={LINKS.github} target="_blank" rel="noopener">GitHub</a>
-          <a href="#download" className="btn btn-sm">
+          <a href={LINKS.discord} target="_blank" rel="noopener">Discord</a>
+          <a href={LINKS.dmg} className="btn btn-sm">
             Download
           </a>
         </div>
@@ -41,10 +42,10 @@ function Hero() {
           A native desktop app that indexes your folders, chats with any model,
           and saves every artifact locally. Like Codex for the rest of your work.
           <br />
-          <span className="hero-dim">Powered by Oh My Pi.</span>
+          <span className="hero-dim">Powered by <a href={LINKS.ohmypi} target="_blank" rel="noopener">Oh My Pi</a>.</span>
         </p>
         <div className="hero-actions">
-          <a href={LINKS.dmg} className="btn btn-lg" target="_blank" rel="noopener">
+          <a href={LINKS.dmg} className="btn btn-lg">
             <span className="btn-icon">&darr;</span>
             Download for Mac
           </a>
@@ -62,7 +63,7 @@ function Hero() {
             <span className="window-dot red" />
             <span className="window-dot yellow" />
             <span className="window-dot green" />
-            <span className="window-title">PiWork</span>
+            <span className="window-title">piwork</span>
           </div>
           <div className="window-body">
             {/* Left sidebar */}
@@ -219,13 +220,13 @@ function AISection() {
         <div className="section-header">
           <span className="section-label">AI Integration</span>
           <h2 className="section-title">
-            Any model. 5 tools.
+            Any model. Any subscription.
             <br />
             <span className="highlight-text">One workspace that gets things done.</span>
           </h2>
           <p className="section-subtitle">
-            Bring your own API key from any provider. Pick your model and switch anytime.
-            Built on <a href="https://github.com/nichochar/oh-my-pi" target="_blank" rel="noopener">Oh My Pi</a> &mdash; the open-source AI agent framework.
+            Bring your own API key or log in with your existing Claude, ChatGPT, Copilot, or Cursor subscription. Pick your model and switch anytime.
+            Built on <a href={LINKS.ohmypi} target="_blank" rel="noopener">Oh My Pi</a> &mdash; the open-source AI agent framework.
           </p>
         </div>
 
@@ -249,8 +250,8 @@ function AISection() {
           <div className="ai-tools">
             <h3 className="ai-section-title">Tools</h3>
             <p className="ai-tools-desc">
-              The AI doesn't just chat &mdash; it <em>acts</em>. With 5 specialized tools,
-              it can search your files, create artifacts, and manage your knowledge.
+              The AI doesn't just chat &mdash; it <em>acts</em>. With {TOOLS.length} specialized tools,
+              it can search your files, create artifacts, browse the web, and generate media.
             </p>
             <div className="tools-grid">
               {TOOLS.map((t, i) => (
@@ -280,7 +281,7 @@ function SearchSection() {
             Index any folder. Search <span className="highlight-text">everything</span> instantly.
           </h2>
           <p className="section-subtitle">
-            Point PiWork at a folder, give it an @alias. QMD indexes it with BM25 + local semantic embeddings.
+            Point piwork at a folder, give it an @alias. QMD indexes it with BM25 + local semantic embeddings.
             The AI searches before it answers.
           </p>
         </div>
@@ -304,11 +305,11 @@ function SearchSection() {
                 </div>
               </div>
 
-              {/* Step 2: PiWork searches */}
+              {/* Step 2: piwork searches */}
               <div className="search-step">
                 <div className="search-step-label">
                   <span className="search-step-num">2</span>
-                  PiWork searches
+                  piwork searches
                 </div>
                 <div className="search-results-card">
                   <div className="search-results-header">
@@ -387,15 +388,15 @@ function Download() {
         <div className="pi-symbol">&pi;</div>
         <h2 className="section-title">Ready to work?</h2>
         <p className="section-subtitle">
-          Download PiWork for free. Bring your API key and start getting things done.
+          Download piwork for free. Bring your API key or log in with your existing AI subscription.
         </p>
         <div className="download-buttons">
-          <a href={LINKS.dmg} className="btn btn-xl" target="_blank" rel="noopener">
+          <a href={LINKS.dmg} className="btn btn-xl">
             <span className="btn-icon">&darr;</span>
             Download for macOS
           </a>
-          <a href={LINKS.github} className="btn btn-xl btn-outline" target="_blank" rel="noopener">
-            View on GitHub
+          <a href={LINKS.discord} className="btn btn-xl btn-outline" target="_blank" rel="noopener">
+            Join Discord
           </a>
         </div>
         <p className="download-note">
@@ -411,18 +412,17 @@ function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <img src="/icon.png" alt="PiWork" className="footer-icon" />
-          <span>PiWork</span>
+          <img src={import.meta.env.BASE_URL + 'icon.png'} alt="piwork" className="footer-icon" />
+          <span>piwork</span>
         </div>
         <div className="footer-links">
           <a href={LINKS.github} target="_blank" rel="noopener">GitHub</a>
+          <a href={LINKS.discord} target="_blank" rel="noopener">Discord</a>
           <a href={LINKS.issues} target="_blank" rel="noopener">Issues</a>
-          <a href={LINKS.openRouter} target="_blank" rel="noopener">OpenRouter</a>
-          <a href="https://platform.openai.com" target="_blank" rel="noopener">OpenAI</a>
-          <a href="https://console.anthropic.com" target="_blank" rel="noopener">Anthropic</a>
+          <a href={LINKS.ohmypi} target="_blank" rel="noopener">Oh My Pi</a>
         </div>
         <div className="footer-copy">
-          Built with &#129302; by <a href={LINKS.twitter} target="_blank" rel="noopener">@Jonovono</a>
+          Built by <a href={LINKS.twitter} target="_blank" rel="noopener">@Jonovono</a>
         </div>
       </div>
     </footer>
