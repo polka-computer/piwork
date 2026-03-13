@@ -51,10 +51,10 @@ jobs:
         include:
           - runner: macos-14
             label: macos-arm64
-          - runner: windows-latest
-            label: win-x64
-          - runner: ubuntu-latest
-            label: linux-x64
+          # - runner: windows-latest
+          #   label: win-x64
+          # - runner: ubuntu-latest
+          #   label: linux-x64
 
     runs-on: ${{ matrix.runner }}
     env:
