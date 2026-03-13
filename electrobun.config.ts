@@ -44,9 +44,6 @@ export default {
 			postWrap: "./scripts/install-mac-app-icon.ts",
 			postPackage: "./scripts/post-package.ts",
 		},
-		release: {
-			baseUrl: releaseBaseUrl,
-		},
 		mac: {
 			bundleCEF: false,
 			icons: "assets/piwork/icon.iconset",
@@ -61,5 +58,8 @@ export default {
 			bundleCEF: false,
 			icon: "build/release-assets/win/piwork.ico",
 		},
+	},
+	release: {
+		baseUrl: releaseBaseUrl,
 	},
 } satisfies ElectrobunConfig;
