@@ -18,6 +18,7 @@ import {
 	cancelActiveRunViaBun,
 	checkForUpdateViaBun,
 	createChatViaBun,
+	deleteArtifactViaBun,
 	deleteChatViaBun,
 	downloadUpdateViaBun,
 	getApiKeyStatusViaBun,
@@ -107,6 +108,11 @@ export const useArchiveChatMutation = () =>
 export const useDeleteChatMutation = () =>
 	useMutation<DashboardState, Error, string>({
 		mutationFn: deleteChatViaBun,
+	});
+
+export const useDeleteArtifactMutation = () =>
+	useMutation<DashboardState, Error, string>({
+		mutationFn: deleteArtifactViaBun,
 	});
 
 export const useAddWorkspaceMutation = () =>

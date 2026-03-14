@@ -290,6 +290,10 @@ export interface PiworkViewRPCSchema {
 				params: { chatId: string };
 				response: DashboardState;
 			};
+			deleteArtifact: {
+				params: { artifactId: string };
+				response: DashboardState;
+			};
 			getAvailableModels: {
 				params: {};
 				response: { models: AvailableModel[]; error?: string };

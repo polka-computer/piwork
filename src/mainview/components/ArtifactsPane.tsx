@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { ArtifactKind, DashboardState } from "../../shared/view-rpc";
 import {
 	MAX_ARTIFACT_CARD_TAGS,
@@ -24,6 +26,7 @@ export default function ArtifactsPane({
 	onHideArtifactTagTray,
 	onToggleArtifactTagFilter,
 	onOpenArtifact,
+	onDeleteArtifact,
 }: {
 	dashboard: DashboardState | null;
 	artifactSearchQuery: string;
@@ -44,12 +47,39 @@ export default function ArtifactsPane({
 	onHideArtifactTagTray: () => void;
 	onToggleArtifactTagFilter: (tag: string) => void;
 	onOpenArtifact: (artifactId: string) => void;
+	onDeleteArtifact: (artifactId: string) => void;
 }) {
+	const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; artifactId: string } | null>(null);
+	const [confirmDelete, setConfirmDelete] = useState(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+
+	const closeMenu = useCallback(() => {
+		setCtxMenu(null);
+		setConfirmDelete(false);
+	}, []);
+
+	useEffect(() => {
+		if (!ctxMenu) return;
+		const handleClick = (event: MouseEvent) => {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) closeMenu();
+		};
+		const handleKey = (event: KeyboardEvent) => {
+			if (event.key === "Escape") closeMenu();
+		};
+		document.addEventListener("mousedown", handleClick);
+		document.addEventListener("keydown", handleKey);
+		return () => {
+			document.removeEventListener("mousedown", handleClick);
+			document.removeEventListener("keydown", handleKey);
+		};
+	}, [ctxMenu, closeMenu]);
+
 	const visibleArtifactFilterTags = artifactShowAllTags
 		? orderedArtifactTags
 		: orderedArtifactTags.slice(0, MAX_ARTIFACT_FILTER_TAGS);
 
 	return (
+		<>
 		<div className="flex min-h-0 flex-1 flex-col">
 			<div className="border-b border-white/6 px-3 py-2">
 				<div className="flex flex-col gap-2">
@@ -196,6 +226,12 @@ export default function ArtifactsPane({
 									type="button"
 									key={artifact.id}
 									onClick={() => onOpenArtifact(artifact.id)}
+									onContextMenu={(event) => {
+										event.preventDefault();
+										event.stopPropagation();
+										setCtxMenu({ x: event.clientX, y: event.clientY, artifactId: artifact.id });
+										setConfirmDelete(false);
+									}}
 									className="artifact-card text-left"
 								>
 									{artifact.thumbnailUrl && (
@@ -235,5 +271,70 @@ export default function ArtifactsPane({
 				</div>
 			</div>
 		</div>
+		{ctxMenu && createPortal(
+			<div
+				ref={menuRef}
+				style={{ position: "fixed", left: ctxMenu.x, top: ctxMenu.y, zIndex: 9999 }}
+				className="min-w-[148px] rounded-xl border border-white/8 bg-[var(--overlay-menu)] py-1 shadow-2xl"
+			>
+				{confirmDelete ? (
+					<>
+						<p className="px-3 py-1.5 text-[11px] text-[var(--text-muted)]">Delete this artifact?</p>
+						<div className="flex items-center gap-1 px-2 pb-1">
+							<button
+								type="button"
+								className="rounded-md bg-[var(--danger-border)] px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-[#8a3747]"
+								onClick={(event) => {
+									event.stopPropagation();
+									const id = ctxMenu.artifactId;
+									closeMenu();
+									onDeleteArtifact(id);
+								}}
+							>
+								Delete
+							</button>
+							<button
+								type="button"
+								className="rounded-md px-2.5 py-1 text-[11px] font-medium text-[var(--text-muted)] transition hover:bg-white/[0.04]"
+								onClick={(event) => {
+									event.stopPropagation();
+									closeMenu();
+								}}
+							>
+								Cancel
+							</button>
+						</div>
+					</>
+				) : (
+					<>
+						<button
+							type="button"
+							className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-[var(--text-primary)] transition hover:bg-white/[0.04]"
+							onClick={(event) => {
+								event.stopPropagation();
+								const id = ctxMenu.artifactId;
+								closeMenu();
+								onOpenArtifact(id);
+							}}
+						>
+							Open
+						</button>
+						<div className="my-1 border-t border-white/6" />
+						<button
+							type="button"
+							className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[var(--danger)] transition hover:bg-[var(--danger-surface)]"
+							onClick={(event) => {
+								event.stopPropagation();
+								setConfirmDelete(true);
+							}}
+						>
+							Delete
+						</button>
+					</>
+				)}
+			</div>,
+			document.body,
+		)}
+		</>
 	);
 }

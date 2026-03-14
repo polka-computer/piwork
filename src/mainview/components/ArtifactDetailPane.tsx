@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ArtifactDetail } from "../../shared/view-rpc";
 import { formatDate } from "../app-shared";
 import { showArtifactInFinderViaBun } from "../rpc";
@@ -7,10 +8,14 @@ import MarkdownRenderer from "./MarkdownRenderer";
 export default function ArtifactDetailPane({
 	activeArtifact,
 	onSaveArtifactTags,
+	onDeleteArtifact,
 }: {
 	activeArtifact: ArtifactDetail | null;
 	onSaveArtifactTags: (artifactId: string, tags: string[]) => Promise<void>;
+	onDeleteArtifact: (artifactId: string) => void;
 }) {
+	const [confirmDelete, setConfirmDelete] = useState(false);
+
 	if (!activeArtifact) {
 		return (
 			<div className="flex min-h-0 flex-1 items-center justify-center">
@@ -42,6 +47,45 @@ export default function ArtifactDetailPane({
 									<path d="M14 2 7.5 8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
 								</svg>
 							</button>
+							{confirmDelete ? (
+								<div className="flex items-center gap-1">
+									<span className="text-[11px] text-[var(--text-muted)]">Delete?</span>
+									<button
+										type="button"
+										className="rounded-md bg-[var(--danger-border)] px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-[#8a3747]"
+										onClick={() => {
+											setConfirmDelete(false);
+											onDeleteArtifact(activeArtifact.id);
+										}}
+									>
+										Delete
+									</button>
+									<button
+										type="button"
+										className="rounded-md px-2.5 py-1 text-[11px] font-medium text-[var(--text-muted)] transition hover:bg-white/[0.04]"
+										onClick={() => setConfirmDelete(false)}
+									>
+										Cancel
+									</button>
+								</div>
+							) : (
+								<button
+									type="button"
+									onClick={() => setConfirmDelete(true)}
+									className="focus-ring inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/8 text-[var(--text-dim)] transition hover:bg-white/[0.04] hover:text-[var(--text-primary)]"
+									title="Delete artifact"
+								>
+									<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+										<path
+											d="M3.5 4.5h9m-8.25 0 .5 7.25c.04.64.57 1.13 1.2 1.13h3.1c.63 0 1.16-.49 1.2-1.13l.5-7.25M6.25 4.5V3.4c0-.5.4-.9.9-.9h1.7c.5 0 .9.4.9.9v1.1"
+											stroke="currentColor"
+											strokeWidth="1.2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+									</svg>
+								</button>
+							)}
 							<span className="text-[10px] text-[var(--text-muted)]">
 								Updated {formatDate(activeArtifact.updatedAt)}
 							</span>

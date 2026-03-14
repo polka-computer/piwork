@@ -107,6 +107,9 @@ export const markChatReviewedViaBun = async (chatId: string): Promise<DashboardS
 export const deleteChatViaBun = async (chatId: string): Promise<DashboardState> =>
 	ensureBridge().request.deleteChat({ chatId });
 
+export const deleteArtifactViaBun = async (artifactId: string): Promise<DashboardState> =>
+	ensureBridge().request.deleteArtifact({ artifactId });
+
 export const getAvailableModelsViaBun = async (): Promise<{ models: AvailableModel[]; error?: string }> =>
 	ensureBridge().request.getAvailableModels({});
 

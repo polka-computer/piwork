@@ -46,6 +46,7 @@ import {
 	useCheckForUpdateMutation,
 	useCreateChatMutation,
 	useDashboardQuery,
+	useDeleteArtifactMutation,
 	useDeleteChatMutation,
 	useDownloadUpdateMutation,
 	useRemoveApiKeyMutation,
@@ -82,6 +83,7 @@ export function usePiworkAppController() {
 	const retryLastMessageMutation = useRetryLastMessageMutation();
 	const archiveChatMutation = useArchiveChatMutation();
 	const deleteChatMutation = useDeleteChatMutation();
+	const deleteArtifactMutation = useDeleteArtifactMutation();
 	const addWorkspaceMutation = useAddWorkspaceMutation();
 	const renameWorkspaceMutation = useRenameWorkspaceMutation();
 	const removeWorkspaceMutation = useRemoveWorkspaceMutation();
@@ -627,6 +629,22 @@ export function usePiworkAppController() {
 		}
 	};
 
+	const handleDeleteArtifact = async (artifactId: string) => {
+		try {
+			const nextDashboard = await deleteArtifactMutation.mutateAsync(artifactId);
+			queryClient.setQueryData(queryKeys.dashboard, nextDashboard);
+			if (state.activeArtifactId === artifactId) {
+				dispatch({ type: "set_active_artifact_id", value: null });
+				dispatch({ type: "set_active_view", value: "artifacts" });
+			}
+			if (state.artifactModalId === artifactId) {
+				dispatch({ type: "set_artifact_modal_id", value: null });
+			}
+		} catch (error) {
+			toast.error(toErrorMessage(error));
+		}
+	};
+
 	const handleSaveArtifactTags = async (artifactId: string, tags: string[]) => {
 		try {
 			const response = await updateArtifactMutation.mutateAsync({ artifactId, tags });
@@ -804,6 +822,7 @@ export function usePiworkAppController() {
 		handleArchiveChat,
 		handleArchiveCompletedChats,
 		handleDeleteChat,
+		handleDeleteArtifact,
 		handleSaveArtifactTags,
 		handleSaveApiKey,
 		handleRemoveApiKey,

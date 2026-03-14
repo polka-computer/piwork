@@ -155,12 +155,14 @@ function AppInner() {
 									}}
 									onToggleArtifactTagFilter={app.toggleArtifactTagFilter}
 									onOpenArtifact={(artifactId) => void app.handleOpenArtifact(artifactId)}
+								onDeleteArtifact={(artifactId) => void app.handleDeleteArtifact(artifactId)}
 								/>
 							)}
 							{app.state.activeView === "artifact-detail" && (
 								<ArtifactDetailPane
 									activeArtifact={app.activeArtifact}
 									onSaveArtifactTags={app.handleSaveArtifactTags}
+									onDeleteArtifact={(artifactId) => void app.handleDeleteArtifact(artifactId)}
 								/>
 							)}
 							{app.state.activeView === "settings" && (

@@ -611,6 +611,11 @@ export const deleteChat = async (chatId: string): Promise<void> => {
 	]);
 };
 
+export const deleteArtifact = async (artifactId: string): Promise<void> => {
+	removeArtifactFromIndex(artifactId);
+	await rm(artifactDir(artifactId), { recursive: true, force: true });
+};
+
 export const initializeArtifactStore = async (): Promise<void> => {
 	initArtifactIndex();
 	const artifactIds = await listArtifactIds();

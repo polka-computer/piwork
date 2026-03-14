@@ -109,6 +109,11 @@ export const createMainviewRpc = (options: {
 					return store.getDashboardState();
 				},
 
+				deleteArtifact: async ({ artifactId }) => {
+					await store.deleteArtifact(artifactId);
+					return store.getDashboardState();
+				},
+
 				getAvailableModels: async () => {
 					const modelStatus: ModelStatus = await getModelStatus();
 					return {
