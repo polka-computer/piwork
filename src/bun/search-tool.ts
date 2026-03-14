@@ -1,6 +1,6 @@
 import { Type, type Static } from "@sinclair/typebox";
 import { StringEnum, type CustomTool } from "@oh-my-pi/pi-coding-agent";
-import type { QmdManager } from "./qmd-manager";
+import type { SearchEngine } from "./search-engine";
 
 const PiworkSearchParams = Type.Object({
 	action: StringEnum(["status", "search", "query", "get", "multi_get"] as const, {
@@ -47,8 +47,10 @@ const textContent = (text: string) => ({
 	content: [{ type: "text" as const, text }],
 });
 
-export const createQmdSearchTool = (
-	qmdManager: QmdManager,
+const log = (msg: string) => console.log(`[piwork:search-tool] ${msg}`);
+
+export const createSearchTool = (
+	searchEngine: SearchEngine,
 ): CustomTool<typeof PiworkSearchParams> => ({
 	name: "piwork_search",
 	label: "piwork Search",
@@ -57,21 +59,27 @@ export const createQmdSearchTool = (
 	parameters: PiworkSearchParams,
 
 	async execute(_toolCallId, params: PiworkSearchInput) {
+		log(`action=${params.action} query=${params.query ?? ""} collection=${params.collection ?? "all"}`);
 		try {
 			switch (params.action) {
-				case "status":
-					return jsonContent({
-						...(await qmdManager.getStatus()),
-						collections: qmdManager.getCollectionNames(),
-					});
+				case "status": {
+					const status = await searchEngine.getStatus();
+					const collections = searchEngine.getCollectionNames();
+					log(`status: ${status.status}, totalDocs=${status.totalDocuments}, collections=${collections.join(",")}`);
+					return jsonContent({ ...status, collections });
+				}
 
 				case "search": {
 					const query = params.query?.trim();
 					if (!query) return textContent("Error: query is required for search.");
-					const results = await qmdManager.search(query, {
+					const results = await searchEngine.search(query, {
 						limit: params.limit ?? 10,
 						collection: params.collection,
 					});
+					log(`search "${query}": ${results.length} results`);
+					if (results.length > 0) {
+						log(`  top: ${results.slice(0, 3).map((r) => `${r.title} (${r.score.toFixed(3)})`).join(", ")}`);
+					}
 					return jsonContent({
 						resultCount: results.length,
 						results: results.map((r) => ({
@@ -87,11 +95,15 @@ export const createQmdSearchTool = (
 				case "query": {
 					const query = params.query?.trim();
 					if (!query) return textContent("Error: query is required for query.");
-					const results = await qmdManager.query(query, {
+					const results = await searchEngine.query(query, {
 						limit: params.limit ?? 10,
 						collection: params.collection,
 						intent: params.intent,
 					});
+					log(`query "${query}": ${results.length} results (semantic=${searchEngine.isSemanticEnabled()})`);
+					if (results.length > 0) {
+						log(`  top: ${results.slice(0, 3).map((r) => `${r.title} (${r.score.toFixed(3)})`).join(", ")}`);
+					}
 					return jsonContent({
 						resultCount: results.length,
 						results: results.map((r) => ({
@@ -107,7 +119,8 @@ export const createQmdSearchTool = (
 				case "get": {
 					const pathOrDocid = params.path?.trim();
 					if (!pathOrDocid) return textContent("Error: path is required for get.");
-					const doc = await qmdManager.get(pathOrDocid);
+					const doc = await searchEngine.get(pathOrDocid);
+					log(`get "${pathOrDocid}": ${doc ? "found" : "not found"}`);
 					if (!doc) return textContent(`Document not found: ${pathOrDocid}`);
 					return jsonContent(doc);
 				}
@@ -119,10 +132,11 @@ export const createQmdSearchTool = (
 						return textContent("Error: either pattern or paths array is required for multi_get.");
 					}
 					const resolvedPattern = pattern || paths!.map((p) => p.trim()).join(",");
-					const { docs, errors } = await qmdManager.multiGet(resolvedPattern, {
+					const { docs, errors } = await searchEngine.multiGet(resolvedPattern, {
 						includeBody: true,
 						maxBytes: params.maxBytes,
 					});
+					log(`multi_get "${resolvedPattern}": ${docs.length} docs, ${errors.length} errors`);
 					return jsonContent({
 						pattern: resolvedPattern,
 						found: docs.filter((d: any) => !d.skipped).length,
@@ -133,9 +147,11 @@ export const createQmdSearchTool = (
 				}
 
 				default:
+					log(`unknown action: ${params.action}`);
 					return textContent(`Unknown piwork_search action: ${params.action}`);
 			}
 		} catch (error) {
+			log(`error: ${error instanceof Error ? error.message : String(error)}`);
 			return textContent(
 				`Error: ${error instanceof Error ? error.message : String(error)}`,
 			);

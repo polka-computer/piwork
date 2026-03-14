@@ -1,9 +1,10 @@
 {
 	"name": "piwork",
-	"version": "0.1.16",
+	"version": "0.1.18",
 	"description": "PiWork desktop app for chat-driven work, indexed folders, and generated artifacts",
 	"scripts": {
-		"build": "vite build",
+		"build:dylib": "xcrun clang -dynamiclib -fobjc-arc -framework NaturalLanguage -framework Foundation -o build/libNLEmbedding.dylib native/nl_embedding.m",
+		"build": "bun run build:dylib && vite build",
 		"start": "bun run build && electrobun dev",
 		"dev": "bun run build && electrobun dev --watch",
 		"dev:hmr": "concurrently \"bun run hmr\" \"bun run dev\"",
@@ -15,7 +16,6 @@
 	"dependencies": {
 		"@oh-my-pi/pi-coding-agent": "^13.10.1",
 		"@tanstack/react-query": "^5.90.21",
-		"@tobilu/qmd": "^2.0.1",
 		"effect": "^3.19.19",
 		"electrobun": "1.15.1",
 		"mermaid": "^11.13.0",

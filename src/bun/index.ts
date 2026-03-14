@@ -9,18 +9,18 @@ import { startAutoUpdateChecker } from "./auto-update-checker";
 import { createMainviewRpc } from "./mainview-rpc";
 import { PIWORK_OBJECTS_DIR } from "./piwork-paths";
 import * as store from "./piwork-store";
-import { QmdManager } from "./qmd-manager";
+import { SearchEngine } from "./search-engine";
 import { resolveMainViewUrl } from "./resolve-mainview-url";
 
-const qmdManager = new QmdManager();
+const searchEngine = new SearchEngine();
 
-const reinitializeQmd = async () => {
+const reinitializeSearch = async () => {
 	try {
 		const [workspaces, semanticSearchEnabled] = await Promise.all([
 			store.listWorkspaces(),
 			store.getSemanticSearchEnabled(),
 		]);
-		await qmdManager.initialize(
+		await searchEngine.initialize(
 			workspaces.map((workspace) => ({
 				name: workspace.alias,
 				path: workspace.path,
@@ -30,26 +30,26 @@ const reinitializeQmd = async () => {
 		);
 		// Auto-add context annotations for each workspace
 		for (const workspace of workspaces) {
-			await qmdManager.addContext(
+			await searchEngine.addContext(
 				workspace.alias,
 				"/",
 				`Workspace "${workspace.alias}" — indexed folder at ${workspace.path}`,
 			);
 		}
-		console.log(`[piwork:bun] qmd initialized with ${workspaces.length} workspace(s)`);
+		console.log(`[piwork:bun] search engine initialized with ${workspaces.length} workspace(s)`);
 	} catch (error) {
-		console.error("[piwork:bun] qmd initialization failed:", error);
+		console.error("[piwork:bun] search engine initialization failed:", error);
 	}
 };
 
-const getAppInfo = createAppInfoLoader(qmdManager);
+const getAppInfo = createAppInfoLoader(searchEngine);
 const url = await resolveMainViewUrl();
 
 installApplicationMenu(APP_NAME);
 
 let rpc: ReturnType<typeof createMainviewRpc>;
 const chatRunner = createChatRunner({
-	qmdManager,
+	searchEngine,
 	sendOmpEvent: (event) => {
 		rpc.send.ompEvent(event);
 	},
@@ -57,7 +57,7 @@ const chatRunner = createChatRunner({
 
 rpc = createMainviewRpc({
 	getAppInfo,
-	reinitializeQmd,
+	reinitializeSearch,
 	chatRunner,
 });
 
@@ -76,7 +76,7 @@ await store.initializeArtifactStore();
 startArtifactWatcher(PIWORK_OBJECTS_DIR, async (artifactId) => {
 	await store.syncArtifactFromDisk(artifactId);
 });
-void reinitializeQmd();
+void reinitializeSearch();
 
 const mainWindow = new BrowserWindow({
 	title: APP_NAME,

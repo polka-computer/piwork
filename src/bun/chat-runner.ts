@@ -10,9 +10,9 @@ import {
 	piworkResourcesTool,
 } from "./piwork-tools";
 import * as store from "./piwork-store";
-import { createQmdSearchTool } from "./qmd-tool";
+import { createSearchTool } from "./search-tool";
 import { createReplicateTool } from "./replicate-tool";
-import type { QmdManager } from "./qmd-manager";
+import type { SearchEngine } from "./search-engine";
 import { getRuntimeAdapter } from "./runtime";
 
 const runtime = getRuntimeAdapter();
@@ -36,7 +36,7 @@ const isAbortError = (error: unknown): boolean => {
 };
 
 export const createChatRunner = (options: {
-	qmdManager: QmdManager;
+	searchEngine: SearchEngine;
 	sendOmpEvent: (event: OmpStreamEvent) => void;
 }): ChatRunner => {
 	const activeRunsByChatId = new Map<string, ReturnType<typeof runtime.startRun>>();
@@ -111,7 +111,7 @@ export const createChatRunner = (options: {
 					modelRegistry: registry,
 					modelId,
 					attachmentPaths,
-					systemPrompt: buildSystemPrompt(workspaces, mentionedAliases, existingArtifactTags, { qmdAvailable: options.qmdManager.isAvailable() }),
+					systemPrompt: buildSystemPrompt(workspaces, mentionedAliases, existingArtifactTags, { searchAvailable: options.searchEngine.isAvailable() }),
 					onEvent: options.sendOmpEvent,
 					customTools: [
 						piworkResourcesTool,
@@ -119,7 +119,7 @@ export const createChatRunner = (options: {
 						createPiworkArtifactsTool(chatId, {
 							onArtifactWrite: noteArtifactWrite,
 						}),
-						...(options.qmdManager.isAvailable() ? [createQmdSearchTool(options.qmdManager)] : []),
+						...(options.searchEngine.isAvailable() ? [createSearchTool(options.searchEngine)] : []),
 						...(process.env.REPLICATE_API_TOKEN ? [createReplicateTool(chatId, { onArtifactWrite: noteArtifactWrite })] : []),
 					],
 				},

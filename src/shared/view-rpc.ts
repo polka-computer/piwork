@@ -99,7 +99,7 @@ export interface ApiKeyProviderStatus {
 	category?: "model" | "research";
 }
 
-export interface QmdStatus {
+export interface SearchStatus {
 	status: "unconfigured" | "indexing" | "embedding" | "ready" | "error";
 	semanticSearchEnabled: boolean;
 	collections: number;
@@ -108,6 +108,7 @@ export interface QmdStatus {
 	needsEmbeddingCount: number;
 	lastError?: string;
 }
+
 
 export interface UpdateStatusDetails {
 	fromHash?: string;
@@ -152,7 +153,7 @@ export interface AppInfo {
 	arch: "arm64" | "x64";
 	selectedModelId?: string;
 	modelStatus: ModelStatus;
-	qmd: QmdStatus;
+	search: SearchStatus;
 	update: UpdateState;
 }
 

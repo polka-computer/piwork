@@ -8,7 +8,7 @@ import type { ChatRunner } from "./chat-runner";
 
 export const createMainviewRpc = (options: {
 	getAppInfo: () => Promise<AppInfo>;
-	reinitializeQmd: () => Promise<void>;
+	reinitializeSearch: () => Promise<void>;
 	chatRunner: ChatRunner;
 }) =>
 	BrowserView.defineRPC<PiworkViewRPCSchema>({
@@ -52,7 +52,7 @@ export const createMainviewRpc = (options: {
 
 				setSemanticSearchEnabled: async ({ enabled }) => {
 					await store.setSemanticSearchEnabled(enabled);
-					await options.reinitializeQmd();
+					await options.reinitializeSearch();
 					return options.getAppInfo();
 				},
 
@@ -78,19 +78,19 @@ export const createMainviewRpc = (options: {
 
 				addWorkspace: async ({ path, alias }) => {
 					await store.addWorkspace(path, alias);
-					await options.reinitializeQmd();
+					await options.reinitializeSearch();
 					return store.getDashboardState();
 				},
 
 				renameWorkspace: async ({ workspaceId, alias }) => {
 					await store.renameWorkspace(workspaceId, alias);
-					await options.reinitializeQmd();
+					await options.reinitializeSearch();
 					return store.getDashboardState();
 				},
 
 				removeWorkspace: async ({ workspaceId }) => {
 					await store.removeWorkspace(workspaceId);
-					await options.reinitializeQmd();
+					await options.reinitializeSearch();
 					return store.getDashboardState();
 				},
 

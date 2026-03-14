@@ -247,12 +247,12 @@ export function usePiworkAppController() {
 
 	useEffect(() => {
 		if (!bridgeAvailable) return;
-		if (!appInfo?.qmd || !["indexing", "embedding"].includes(appInfo.qmd.status)) return;
+		if (!appInfo?.search || !["indexing", "embedding"].includes(appInfo.search.status)) return;
 		const interval = setInterval(() => {
 			void refreshAppInfo();
 		}, 2500);
 		return () => clearInterval(interval);
-	}, [bridgeAvailable, appInfo?.qmd, refreshAppInfo]);
+	}, [bridgeAvailable, appInfo?.search, refreshAppInfo]);
 
 	useEffect(
 		() => () => {

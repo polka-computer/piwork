@@ -10,7 +10,7 @@ export interface PiworkPaths {
 	indexDir: string;
 	configFile: string;
 	artifactIndexDb: string;
-	qmdDbPath: string;
+	searchDbPath: string;
 	memoryFile: string;
 	tocFile: string;
 	linksFile: string;
@@ -27,7 +27,7 @@ export const PIWORK_SETTINGS_DIR = join(ROOT_DIR, "settings");
 export const PIWORK_INDEX_DIR = join(ROOT_DIR, "index");
 export const PIWORK_CONFIG_FILE = join(PIWORK_SETTINGS_DIR, "config.json");
 export const PIWORK_ARTIFACT_INDEX_DB = join(PIWORK_INDEX_DIR, "artifacts.sqlite");
-export const PIWORK_QMD_DB_PATH = join(ROOT_DIR, "qmd.sqlite");
+export const PIWORK_SEARCH_DB_PATH = join(ROOT_DIR, "search.sqlite");
 export const PIWORK_MEMORY_FILE = join(ROOT_DIR, "memory.md");
 export const PIWORK_TOC_FILE = join(ROOT_DIR, "toc.md");
 export const PIWORK_LINKS_FILE = join(ROOT_DIR, "links.csv");
@@ -42,7 +42,7 @@ export const getPiworkPaths = (): PiworkPaths => ({
 	indexDir: PIWORK_INDEX_DIR,
 	configFile: PIWORK_CONFIG_FILE,
 	artifactIndexDb: PIWORK_ARTIFACT_INDEX_DB,
-	qmdDbPath: PIWORK_QMD_DB_PATH,
+	searchDbPath: PIWORK_SEARCH_DB_PATH,
 	memoryFile: PIWORK_MEMORY_FILE,
 	tocFile: PIWORK_TOC_FILE,
 	linksFile: PIWORK_LINKS_FILE,

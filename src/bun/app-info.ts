@@ -4,7 +4,7 @@ import type { AppInfo, UpdateState, UpdateStatusEntry } from "../shared/view-rpc
 import { getModelStatus } from "./model-registry";
 import { PIWORK_ROOT_DIR } from "./piwork-paths";
 import * as store from "./piwork-store";
-import type { QmdManager } from "./qmd-manager";
+import type { SearchEngine } from "./search-engine";
 
 export const APP_NAME = "piwork";
 
@@ -69,16 +69,16 @@ const getLocalAppInfo = async (packageVersion: string): Promise<Pick<AppInfo, "v
 	}
 };
 
-export const createAppInfoLoader = (qmdManager: QmdManager) => {
+export const createAppInfoLoader = (searchEngine: SearchEngine) => {
 	const packageVersionPromise = loadBundledPackageVersion();
 
 	return async (): Promise<AppInfo> => {
 		const packageVersion = await packageVersionPromise;
-		const [{ version, channel, baseUrl }, selectedModelId, modelStatus, qmdStatus] = await Promise.all([
+		const [{ version, channel, baseUrl }, selectedModelId, modelStatus, searchStatus] = await Promise.all([
 			getLocalAppInfo(packageVersion),
 			store.getSelectedModel(),
 			getModelStatus(),
-			qmdManager.getStatus(),
+			searchEngine.getStatus(),
 		]);
 
 		return {
@@ -91,9 +91,9 @@ export const createAppInfoLoader = (qmdManager: QmdManager) => {
 			arch: detectArch(),
 			selectedModelId,
 			modelStatus,
-			qmd: {
-				...qmdStatus,
-				lastError: qmdStatus.lastError || undefined,
+			search: {
+				...searchStatus,
+				lastError: searchStatus.lastError || undefined,
 			},
 			update: getCurrentUpdateState(),
 		};

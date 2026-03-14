@@ -4,7 +4,7 @@ export const buildSystemPrompt = (
 	workspaces: WorkspaceSummary[],
 	mentionedAliases: string[],
 	existingArtifactTags: string[],
-	options?: { qmdAvailable?: boolean },
+	options?: { searchAvailable?: boolean },
 ): string => {
 	const workspaceLines = workspaces.length > 0
 		? workspaces.map((workspace) => `- @${workspace.alias}: ${workspace.path}`).join("\n")
@@ -16,14 +16,14 @@ export const buildSystemPrompt = (
 		? existingArtifactTags.join(", ")
 		: "none yet";
 
-	const qmd = options?.qmdAvailable ?? false;
+	const searchAvailable = options?.searchAvailable ?? false;
 
-	const searchInstructions = qmd
-		? `- piwork_search is powered by QMD, an indexed search engine over workspace documents. ALWAYS use piwork_search first to discover documents before reading files directly with piwork_resources. Do not use file listing or grep to search workspace contents — piwork_search (QMD) is the indexed search tool and will be faster and more accurate.
+	const searchInstructions = searchAvailable
+		? `- piwork_search is an indexed search engine over workspace documents. ALWAYS use piwork_search first to discover documents before reading files directly with piwork_resources. Do not use file listing or grep to search workspace contents — piwork_search is the indexed search tool and will be faster and more accurate.
 - For batch document retrieval, use piwork_search multi_get with glob patterns (e.g. "**/*.md") or paths arrays. Use intent parameter with query action to improve relevance for specific domains.`
-		: `- Use piwork_resources to browse workspace files when the user references a workspace. piwork_search (QMD) is not available in this session.`;
+		: `- Use piwork_resources to browse workspace files when the user references a workspace. piwork_search is not available in this session.`;
 
-	const searchCoreRule = qmd
+	const searchCoreRule = searchAvailable
 		? "- Use piwork_search to find relevant documents before reading files directly. Use piwork_resources for direct file reading once you know the exact path."
 		: "- Use piwork_resources to browse and read workspace files directly.";
 

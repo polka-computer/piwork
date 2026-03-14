@@ -50,7 +50,7 @@ export default function SettingsPane({
 	onRemoveWorkspace: (workspaceId: string) => void;
 }) {
 	const modelStatus = appInfo?.modelStatus;
-	const qmdStatus = appInfo?.qmd;
+	const searchStatus = appInfo?.search;
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col">
@@ -119,46 +119,46 @@ export default function SettingsPane({
 							<div className="rounded-xl border border-white/8 bg-white/[0.02] px-3 py-3">
 								<p className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-dim)]">Semantic search</p>
 								<p className="mt-1 text-[12px] text-[var(--text-primary)]">
-									{!qmdStatus?.semanticSearchEnabled
+									{!searchStatus?.semanticSearchEnabled
 										? "Disabled"
-										: qmdStatus.status === "embedding"
+										: searchStatus.status === "embedding"
 											? "Building semantic index"
-											: qmdStatus.status === "indexing"
+											: searchStatus.status === "indexing"
 												? "Scanning indexed folders"
-												: qmdStatus.status === "error"
+												: searchStatus.status === "error"
 													? "Setup issue"
-													: qmdStatus.hasVectorIndex
+													: searchStatus.hasVectorIndex
 														? "Ready"
 														: "Waiting for embeddings"}
 								</p>
 								<p className="mt-1 text-[10px] leading-5 text-[var(--text-muted)]">
-									{!qmdStatus?.semanticSearchEnabled
-										? "Adds LLM-powered query expansion, vector similarity, and neural reranking on top of keyword search. First enable downloads ~2 GB of local models and builds embeddings. All processing stays on-device."
-										: qmdStatus.status === "embedding"
-											? `${qmdStatus.needsEmbeddingCount} document${qmdStatus.needsEmbeddingCount === 1 ? "" : "s"} waiting for embeddings.`
-											: qmdStatus.status === "indexing"
+									{!searchStatus?.semanticSearchEnabled
+										? "Adds vector similarity on top of keyword search using Apple NLEmbedding. No downloads needed — embedding runs on-device via macOS built-in models."
+										: searchStatus.status === "embedding"
+											? `${searchStatus.needsEmbeddingCount} document${searchStatus.needsEmbeddingCount === 1 ? "" : "s"} waiting for embeddings.`
+											: searchStatus.status === "indexing"
 												? "Refreshing the document index before semantic search is available."
-												: qmdStatus.status === "error"
-													? qmdStatus.lastError || "Semantic search could not finish setup."
-													: qmdStatus.hasVectorIndex
-														? `Hybrid BM25 + vector search with LLM reranking across ${qmdStatus.totalDocuments} indexed document${qmdStatus.totalDocuments === 1 ? "" : "s"}. Queries are expanded and reranked locally.`
+												: searchStatus.status === "error"
+													? searchStatus.lastError || "Semantic search could not finish setup."
+													: searchStatus.hasVectorIndex
+														? `Hybrid BM25 + vector search across ${searchStatus.totalDocuments} indexed document${searchStatus.totalDocuments === 1 ? "" : "s"}. Embeddings via Apple NLEmbedding, all on-device.`
 														: "Enable semantic search after adding folders to build the hybrid index."}
 								</p>
 								<div className="mt-3 flex items-center gap-2">
 									<button
 										type="button"
-										onClick={() => onToggleSemanticSearch(!(qmdStatus?.semanticSearchEnabled ?? false))}
-										className={qmdStatus?.semanticSearchEnabled ? "secondary-button" : "primary-button"}
+										onClick={() => onToggleSemanticSearch(!(searchStatus?.semanticSearchEnabled ?? false))}
+										className={searchStatus?.semanticSearchEnabled ? "secondary-button" : "primary-button"}
 									>
-										{qmdStatus?.semanticSearchEnabled ? "Disable" : "Enable"}
+										{searchStatus?.semanticSearchEnabled ? "Disable" : "Enable"}
 									</button>
 									<button type="button" onClick={onRefreshStatus} className="secondary-button">
 										Refresh
 									</button>
 								</div>
-								{qmdStatus?.semanticSearchEnabled && qmdStatus.status === "ready" && qmdStatus.hasVectorIndex && (
+								{searchStatus?.semanticSearchEnabled && searchStatus.status === "ready" && searchStatus.hasVectorIndex && (
 									<p className="mt-2 text-[10px] leading-4 text-[var(--text-dim)]">
-										Active: query expansion, BM25 + vector hybrid retrieval, neural reranking (qwen3-reranker). All on-device.
+										Active: BM25 + vector hybrid retrieval via Apple NLEmbedding. All on-device.
 									</p>
 								)}
 							</div>
