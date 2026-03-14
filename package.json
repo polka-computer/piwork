@@ -1,9 +1,9 @@
 {
 	"name": "piwork",
-	"version": "0.1.18",
+	"version": "0.1.19",
 	"description": "PiWork desktop app for chat-driven work, indexed folders, and generated artifacts",
 	"scripts": {
-		"build:dylib": "xcrun clang -dynamiclib -fobjc-arc -framework NaturalLanguage -framework Foundation -o build/libNLEmbedding.dylib native/nl_embedding.m",
+		"build:dylib": "xcrun clang -dynamiclib -fobjc-arc -framework NaturalLanguage -framework Foundation -o build/libNLEmbedding.dylib src/native/nl_embedding.m",
 		"build": "bun run build:dylib && vite build",
 		"start": "bun run build && electrobun dev",
 		"dev": "bun run build && electrobun dev --watch",

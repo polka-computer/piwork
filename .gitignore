@@ -3,6 +3,7 @@ dist
 build
 artifacts
 native
+!src/native/
 .DS_Store
 Icon?
 *.log
