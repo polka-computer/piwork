@@ -3,6 +3,7 @@ import { Toaster } from "sonner";
 import AppSidebar from "./components/AppSidebar";
 import ArtifactDetailPane from "./components/ArtifactDetailPane";
 import ArtifactModal from "./components/ArtifactModal";
+import UpdateDialog from "./components/UpdateDialog";
 import ArtifactsPane from "./components/ArtifactsPane";
 import ChatArtifactsRail from "./components/ChatArtifactsRail";
 import ChatPane from "./components/ChatPane";
@@ -204,6 +205,16 @@ function AppInner() {
 					artifact={app.artifactModal}
 					onSaveTags={app.handleSaveArtifactTags}
 					onClose={() => app.setArtifactModalId(null)}
+				/>
+			)}
+			{app.updateDialogVersion && (
+				<UpdateDialog
+					version={app.updateDialogVersion}
+					appInfo={app.appInfo}
+					latestUpdateStatus={app.state.latestUpdateStatus}
+					onDownload={() => void app.handleDownloadUpdate()}
+					onApply={() => void app.handleApplyUpdate()}
+					onDismiss={app.dismissUpdateDialog}
 				/>
 			)}
 			<Toaster position="bottom-center" richColors closeButton />

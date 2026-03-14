@@ -100,6 +100,7 @@ export function usePiworkAppController() {
 	const runtimeCleanupTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 	const lastNotifiedVersionRef = useRef<string | null>(null);
 	const [isInitializing, setIsInitializing] = useState(false);
+	const [updateDialogVersion, setUpdateDialogVersion] = useState<string | null>(null);
 
 	const dashboard = dashboardQuery.data ?? null;
 	const appInfo = appInfoQuery.data ?? null;
@@ -238,14 +239,9 @@ export function usePiworkAppController() {
 			if (lastNotifiedVersionRef.current === version) return;
 			lastNotifiedVersionRef.current = version;
 			void refreshAppInfo();
-			toast(`Update available: v${version}`, {
-				action: {
-					label: "Settings",
-					onClick: () => dispatch({ type: "set_active_view", value: "settings" }),
-				},
-			});
+			setUpdateDialogVersion(version);
 		});
-	}, [bridgeAvailable, refreshAppInfo, dispatch]);
+	}, [bridgeAvailable, refreshAppInfo]);
 
 	useEffect(() => {
 		if (!bridgeAvailable) return;
@@ -777,9 +773,13 @@ export function usePiworkAppController() {
 		bridgeAvailable &&
 		(!state.initialized || isInitializing || dashboardQuery.isLoading || appInfoQuery.isLoading || apiKeyStatusQuery.isLoading);
 
+	const dismissUpdateDialog = useCallback(() => setUpdateDialogVersion(null), []);
+
 	return {
 		bridgeAvailable,
 		isBooting,
+		updateDialogVersion,
+		dismissUpdateDialog,
 		dashboard,
 		appInfo,
 		apiKeyProviders,
