@@ -1,6 +1,6 @@
 {
 	"name": "piwork",
-	"version": "0.1.25",
+	"version": "0.1.26",
 	"description": "PiWork desktop app for chat-driven work, indexed folders, and generated artifacts",
 	"scripts": {
 		"build:dylib": "mkdir -p build && xcrun clang -dynamiclib -fobjc-arc -framework NaturalLanguage -framework Foundation -o build/libNLEmbedding.dylib src/native/nl_embedding.m",

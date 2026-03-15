@@ -60,11 +60,9 @@ ${fileList}
 Here is the diff:
 ${diff}
 
-Write a concise conventional commit message. Rules:
-- First line: an emoji (use 🥧 or 🫐), then a conventional prefix (feat:, fix:, chore:, style:, refactor:, docs:, test:, perf:), then a short summary, then (v${newVersion})
-- If there are multiple change types, pick the most important for the first line
-- Add a blank line then bullet points for each notable change, each prefixed with 🥧 or 🫐
-- Keep it short and punchy
+Write a short conventional commit message. Rules:
+- Single line only: an emoji (use 🥧 or 🫐), then a conventional prefix (feat:, fix:, chore:, style:, refactor:, docs:, test:, perf:), then a brief high-level summary, then (v${newVersion})
+- No body, no bullet points, no details — just the one-liner
 - Output ONLY the commit message, nothing else`;
 
 const claudeResult = spawnSync("claude", ["-p", prompt], {
