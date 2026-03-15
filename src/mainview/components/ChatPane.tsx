@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { ArtifactSummary, ChatThread, DashboardState } from "../../shared/view-rpc";
 import type { ChatRuntimeActivity } from "../app-shared";
 import type { ComposerSubmitInput } from "./ChatComposer";
@@ -40,9 +41,19 @@ export default function ChatPane({
 	onModelChange: (modelId?: string) => void;
 	onSubmit: (input: ComposerSubmitInput) => Promise<void>;
 }) {
+	const scrollRef = useRef<HTMLDivElement>(null);
+	const bottomRef = useRef<HTMLDivElement>(null);
+
+	const messageCount = activeChat?.messages.length ?? 0;
+	const lastMessageId = activeChat?.messages[messageCount - 1]?.id;
+
+	useEffect(() => {
+		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [lastMessageId, messageCount]);
+
 	return (
 		<div className="flex min-h-0 flex-1 flex-col">
-			<div className="scroll-region flex-1 px-3 py-2">
+			<div ref={scrollRef} className="scroll-region flex-1 px-3 py-2">
 				<div className="mx-auto flex w-full max-w-[860px] flex-col gap-1.5">
 					{activeChat?.messages.length ? (
 						activeChat.messages.map((message) => (
@@ -101,6 +112,7 @@ export default function ChatPane({
 							)}
 						</div>
 					)}
+					<div ref={bottomRef} />
 				</div>
 			</div>
 
