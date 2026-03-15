@@ -1,5 +1,7 @@
 import { BrowserView, Updater, Utils } from "electrobun/bun";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import type { AppInfo, ModelStatus, PiworkViewRPCSchema } from "../shared/view-rpc";
 import { getModelStatus, listApiKeyProviders, removeProviderApiKey, setProviderApiKey } from "./model-registry";
 import { PIWORK_ROOT_DIR } from "./piwork-paths";
@@ -140,6 +142,14 @@ export const createMainviewRpc = (options: {
 						providers: await listApiKeyProviders(),
 						modelStatus: await getModelStatus(true),
 					};
+				},
+
+				writeTempFile: async ({ name, base64 }) => {
+					const dir = join(tmpdir(), "piwork-drops");
+					mkdirSync(dir, { recursive: true });
+					const filePath = join(dir, `${Date.now()}-${name}`);
+					writeFileSync(filePath, Buffer.from(base64, "base64"));
+					return { path: filePath };
 				},
 
 				pickFiles: async () => {

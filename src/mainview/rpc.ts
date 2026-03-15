@@ -116,6 +116,9 @@ export const getAvailableModelsViaBun = async (): Promise<{ models: AvailableMod
 export const pickFilesViaBun = async (): Promise<{ paths: string[] }> =>
 	ensureBridge().request.pickFiles({});
 
+export const writeTempFileViaBun = async (name: string, base64: string): Promise<{ path: string }> =>
+	ensureBridge().request.writeTempFile({ name, base64 });
+
 export const cancelActiveRunViaBun = async (
 	chatId: string,
 ): Promise<SendChatMessageResponse> =>

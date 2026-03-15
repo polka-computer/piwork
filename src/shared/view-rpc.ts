@@ -314,6 +314,10 @@ export interface PiworkViewRPCSchema {
 				params: {};
 				response: { paths: string[] };
 			};
+			writeTempFile: {
+				params: { name: string; base64: string };
+				response: { path: string };
+			};
 			cancelActiveRun: {
 				params: { chatId: string };
 				response: ChatCommandResponse;

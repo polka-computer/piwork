@@ -5,7 +5,7 @@ import type {
 	AvailableModel,
 	WorkspaceSummary,
 } from "../../shared/view-rpc";
-import { getAvailableModelsViaBun, hasBunBridge, pickFilesViaBun } from "../rpc";
+import { getAvailableModelsViaBun, hasBunBridge, pickFilesViaBun, writeTempFileViaBun } from "../rpc";
 
 export interface ComposerSubmitInput {
 	prompt: string;
@@ -93,6 +93,7 @@ export default function ChatComposer({
 	const [mentionPickerOpen, setMentionPickerOpen] = useState(false);
 	const [mentionQuery, setMentionQuery] = useState("");
 	const [attachments, setAttachments] = useState<Attachment[]>([]);
+	const [isDragOver, setIsDragOver] = useState(false);
 	const [mentionedArtifacts, setMentionedArtifacts] = useState<ArtifactSummary[]>([]);
 	const [modelLoadError, setModelLoadError] = useState<string | undefined>();
 	const [mentionSelectedIndex, setMentionSelectedIndex] = useState(0);
@@ -319,6 +320,55 @@ export default function ChatComposer({
 		setAttachments((prev) => prev.filter((_, i) => i !== index));
 	};
 
+	// Prevent the webview from navigating when files are dragged/dropped
+	// outside the form target. Uses capture phase.
+	useEffect(() => {
+		const prevent = (e: DragEvent) => e.preventDefault();
+		document.addEventListener("dragover", prevent, true);
+		document.addEventListener("drop", prevent, true);
+		return () => {
+			document.removeEventListener("dragover", prevent, true);
+			document.removeEventListener("drop", prevent, true);
+		};
+	}, []);
+
+	const handleDragOver = (e: React.DragEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setIsDragOver(true);
+	};
+
+	const handleDragEnter = (e: React.DragEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setIsDragOver(true);
+	};
+
+	const handleDragLeave = (e: React.DragEvent<HTMLFormElement>) => {
+		if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+		setIsDragOver(false);
+	};
+
+	const handleDrop = async (e: React.DragEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setIsDragOver(false);
+		const files = e.dataTransfer.files;
+		if (files.length === 0) return;
+
+		const fileArray = Array.from(files);
+		const results = await Promise.all(
+			fileArray.map(async (file) => {
+				// WKWebView doesn't provide .path on File objects — read the data
+				// and write to a temp file on the bun side
+				const buffer = await file.arrayBuffer();
+				const base64 = btoa(
+					new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ""),
+				);
+				const { path } = await writeTempFileViaBun(file.name, base64);
+				return { path, name: basename(path) } satisfies Attachment;
+			}),
+		);
+		setAttachments((prev) => [...prev, ...results]);
+	};
+
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (isSending || disabled) return;
@@ -352,7 +402,14 @@ export default function ChatComposer({
 
 	return (
 		<div className={className}>
-			<form onSubmit={handleSubmit} className="prompt-surface flex flex-col gap-1 px-2 py-1.5">
+				<form
+				onSubmit={handleSubmit}
+				onDragOver={handleDragOver}
+				onDragEnter={handleDragEnter}
+				onDragLeave={handleDragLeave}
+				onDrop={handleDrop}
+				className={`prompt-surface flex flex-col gap-1 px-2 py-1.5 transition-colors ${isDragOver ? "ring-2 ring-[var(--accent)] ring-inset" : ""}`}
+			>
 				{(mentionedArtifacts.length > 0 || attachments.length > 0) && (
 					<div className="flex flex-wrap items-center gap-1 px-0.5 pb-0.5">
 						{mentionedArtifacts.map((artifact) => (

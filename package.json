@@ -1,6 +1,6 @@
 {
 	"name": "piwork",
-	"version": "0.1.26",
+	"version": "0.1.27",
 	"description": "PiWork desktop app for chat-driven work, indexed folders, and generated artifacts",
 	"scripts": {
 		"build:dylib": "mkdir -p build && xcrun clang -dynamiclib -fobjc-arc -framework NaturalLanguage -framework Foundation -o build/libNLEmbedding.dylib src/native/nl_embedding.m",
@@ -12,7 +12,8 @@
 		"build:canary": "bun run build && electrobun build --env=canary",
 		"build:stable": "bun run build && electrobun build --env=stable",
 		"release:mac": "bun ./scripts/release-mac.ts",
-		"release": "bun ./scripts/release-commit.ts"
+		"release": "bun ./scripts/release-commit.ts",
+		"commit": "bun ./scripts/commit.ts"
 	},
 	"dependencies": {
 		"@oh-my-pi/pi-coding-agent": "^13.10.1",
