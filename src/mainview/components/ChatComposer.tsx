@@ -34,9 +34,9 @@ interface ChatComposerProps {
 	focusToken?: number;
 	disabled?: boolean;
 	disabledReason?: string;
+	isBusy?: boolean;
 	onSubmit: (input: ComposerSubmitInput) => Promise<ComposerSubmitResult | void>;
 	onModelChange?: (modelId?: string) => void;
-	onSendingChange?: (sending: boolean) => void;
 	className?: string;
 }
 
@@ -79,13 +79,12 @@ export default function ChatComposer({
 	focusToken,
 	disabled = false,
 	disabledReason,
+	isBusy = false,
 	onSubmit,
 	onModelChange,
-	onSendingChange,
 	className,
 }: ChatComposerProps) {
 	const [prompt, setPrompt] = useState("");
-	const [isSending, setIsSending] = useState(false);
 	const [models, setModels] = useState<AvailableModel[]>([]);
 	const [modelId, setModelId] = useState<string | undefined>(defaultModelId);
 	const [modelPickerOpen, setModelPickerOpen] = useState(false);
@@ -185,22 +184,22 @@ export default function ChatComposer({
 	}, [defaultModelId]);
 
 	useEffect(() => {
-		if (!autoFocus || isSending) return;
+		if (!autoFocus || isBusy) return;
 		queueMicrotask(() => {
 			promptRef.current?.focus();
 			const length = promptRef.current?.value.length ?? 0;
 			promptRef.current?.setSelectionRange(length, length);
 		});
-	}, [autoFocus, isSending]);
+	}, [autoFocus, isBusy]);
 
 	useEffect(() => {
-		if (focusToken === undefined || isSending) return;
+		if (focusToken === undefined || isBusy) return;
 		queueMicrotask(() => {
 			promptRef.current?.focus();
 			const length = promptRef.current?.value.length ?? 0;
 			promptRef.current?.setSelectionRange(length, length);
 		});
-	}, [focusToken, isSending]);
+	}, [focusToken, isBusy]);
 
 	useEffect(() => {
 		setMentionSelectedIndex(0);
@@ -369,9 +368,9 @@ export default function ChatComposer({
 		setAttachments((prev) => [...prev, ...results]);
 	};
 
-	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		if (isSending || disabled) return;
+		if (isBusy || disabled) return;
 		const text = prompt.trim();
 		if (!text) return;
 
@@ -380,25 +379,18 @@ export default function ChatComposer({
 		setPrompt("");
 		setAttachments([]);
 		setMentionedArtifacts([]);
-		setIsSending(true);
-		onSendingChange?.(true);
 
-		try {
-			await onSubmit({
-				prompt: text,
-				modelId,
-				attachmentPaths: attachmentPaths.length > 0 ? attachmentPaths : undefined,
-				mentionedArtifactIds: mentionedArtifactIds.length > 0 ? mentionedArtifactIds : undefined,
-			});
-		} catch (error) {
+		void onSubmit({
+			prompt: text,
+			modelId,
+			attachmentPaths: attachmentPaths.length > 0 ? attachmentPaths : undefined,
+			mentionedArtifactIds: mentionedArtifactIds.length > 0 ? mentionedArtifactIds : undefined,
+		}).catch((error) => {
 			console.error("[piwork:view] composer submit failed:", error);
-		} finally {
-			setIsSending(false);
-			onSendingChange?.(false);
-		}
+		});
 	};
 
-	const composerDisabled = disabled || isSending;
+	const composerDisabled = disabled || isBusy;
 
 	return (
 		<div className={className}>
@@ -423,7 +415,7 @@ export default function ChatComposer({
 									type="button"
 									onClick={() => removeMentionedArtifact(artifact.id)}
 									className="rounded p-0.5 hover:bg-white/10"
-									disabled={isSending}
+									disabled={isBusy}
 								>
 									<svg width="10" height="10" viewBox="0 0 16 16" fill="none">
 										<path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -445,7 +437,7 @@ export default function ChatComposer({
 									type="button"
 									onClick={() => removeAttachment(index)}
 									className="rounded p-0.5 hover:bg-white/10"
-									disabled={isSending}
+									disabled={isBusy}
 								>
 									<svg width="10" height="10" viewBox="0 0 16 16" fill="none">
 										<path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -536,7 +528,7 @@ export default function ChatComposer({
 						disabled={composerDisabled}
 						className="focus-ring inline-flex h-7 items-center justify-center rounded-lg bg-[var(--accent)] px-3.5 text-[10px] font-semibold text-[var(--accent-foreground)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
 					>
-						{isSending ? "Sending..." : submitLabel}
+						{isBusy ? "Working…" : submitLabel}
 					</button>
 				</div>
 

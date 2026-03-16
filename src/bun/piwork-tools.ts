@@ -210,6 +210,33 @@ export const createPiworkArtifactsTool = (
 	},
 });
 
+const PiworkTitleParams = Type.Object({
+	title: Type.String({ description: "A concise 2-4 word title summarizing the chat topic" }),
+});
+
+type PiworkTitleInput = Static<typeof PiworkTitleParams>;
+
+export const createPiworkTitleTool = (
+	chatId: string,
+): CustomTool<typeof PiworkTitleParams> => ({
+	name: "piwork_title",
+	label: "piwork Title",
+	description:
+		"Set a short summary title for the current chat thread. Call this once at the start of every response.",
+	parameters: PiworkTitleParams,
+
+	async execute(_toolCallId, params: PiworkTitleInput) {
+		try {
+			const title = params.title?.trim();
+			if (!title) return textContent("Error: title is required.");
+			await store.updateChatTitle(chatId, title);
+			return textContent(`Title set to: ${title}`);
+		} catch (error) {
+			return textContent(`Error: ${toErrorMessage(error)}`);
+		}
+	},
+});
+
 export const piworkHomeTool: CustomTool<typeof PiworkHomeParams> = {
 	name: "piwork_home",
 	label: "piwork Home",

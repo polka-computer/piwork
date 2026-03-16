@@ -768,6 +768,7 @@ export function usePiworkAppController() {
 	);
 
 	const activeRuntimeActivity = state.activeChatId ? state.runtimeActivityByChatId[state.activeChatId] : undefined;
+	const composerIsBusy = Boolean(state.activeChatId && state.pendingChatIds.includes(state.activeChatId));
 
 	const isBooting =
 		bridgeAvailable &&
@@ -802,6 +803,7 @@ export function usePiworkAppController() {
 		artifactLookup,
 		chatSections,
 		activeRuntimeActivity,
+		composerIsBusy,
 		handleCreateChat,
 		openChatById,
 		refreshDashboard,

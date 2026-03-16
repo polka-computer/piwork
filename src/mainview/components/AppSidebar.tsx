@@ -476,7 +476,6 @@ export default function AppSidebar({
 													meta={`${draftChats.length}`}
 													open={!collapsedSidebarSections.drafts}
 													compact
-													dotClassName={DRAFT_STATUS_TONE.dot}
 													labelClassName={DRAFT_STATUS_TONE.label}
 													onClick={() => onToggleSidebarSection("drafts")}
 												/>
@@ -503,7 +502,6 @@ export default function AppSidebar({
 													meta={`${section.chats.length}`}
 													open={!collapsedSidebarSections[section.status]}
 													compact
-													dotClassName={CHAT_STATUS_TONES[section.status].dot}
 													labelClassName={CHAT_STATUS_TONES[section.status].label}
 													onClick={() => onToggleSidebarSection(section.status)}
 													onContextMenu={

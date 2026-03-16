@@ -121,6 +121,7 @@ function AppInner() {
 									modelError={app.modelStatus?.error}
 									activeRuntimeActivity={app.activeRuntimeActivity}
 									composerBlockedReason={app.composerBlockedReason}
+									composerIsBusy={app.composerIsBusy}
 									composerModelId={app.dashboard.selectedModelId}
 									composerWorkspaces={app.dashboard.workspaces}
 									composerArtifacts={app.dashboard.artifacts}

@@ -14,6 +14,7 @@ export default function ChatPane({
 	modelError,
 	activeRuntimeActivity,
 	composerBlockedReason,
+	composerIsBusy,
 	composerModelId,
 	composerWorkspaces,
 	composerArtifacts,
@@ -31,6 +32,7 @@ export default function ChatPane({
 	modelError?: string;
 	activeRuntimeActivity?: ChatRuntimeActivity;
 	composerBlockedReason?: string;
+	composerIsBusy: boolean;
 	composerModelId?: string;
 	composerWorkspaces: DashboardState["workspaces"];
 	composerArtifacts: DashboardState["artifacts"];
@@ -130,6 +132,7 @@ export default function ChatPane({
 						focusToken={composerFocusToken}
 						disabled={Boolean(composerBlockedReason)}
 						disabledReason={composerBlockedReason}
+						isBusy={composerIsBusy}
 						onModelChange={onModelChange}
 						onSubmit={onSubmit}
 					/>

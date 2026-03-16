@@ -541,7 +541,7 @@ export const appendChatMessage = async (chatId: string, message: ChatMessage): P
 	const nextWorkspaceMentions = Array.from(
 		new Set([...meta.workspaceMentions, ...message.workspaceMentions]),
 	).sort();
-	const nextTitle = meta.messageCount === 0 && message.role === "user" && meta.title === DEFAULT_CHAT_TITLE
+	const nextTitle = meta.title === DEFAULT_CHAT_TITLE && meta.messageCount === 0 && message.role === "user"
 		? deriveTitle(message.content)
 		: meta.title;
 
@@ -557,6 +557,11 @@ export const appendChatMessage = async (chatId: string, message: ChatMessage): P
 			? message.createdAt
 			: null,
 	});
+};
+
+export const updateChatTitle = async (chatId: string, title: string): Promise<void> => {
+	const meta = await readChatMeta(chatId);
+	await writeChatMeta(chatId, { ...meta, title });
 };
 
 export const markChatReviewed = async (chatId: string): Promise<void> => {

@@ -45,6 +45,7 @@ ${searchInstructions}
 - Use piwork_artifacts to create all deliverables, including images via import_file.
 
 Core rules:
+- At the start of every response, call piwork_title with a concise 2-4 word summary of the user's request. Do this before any other tool calls or text output.
 - Indexed workspaces are optional read-only source material. Never edit or mutate them.
 - All writing should happen in piwork's managed home folder, preferably via the piwork_artifacts tool.
 ${searchCoreRule}

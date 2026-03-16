@@ -6,6 +6,7 @@ import { getModelRegistry } from "./model-registry";
 import { PIWORK_ROOT_DIR, PIWORK_SESSIONS_DIR } from "./piwork-paths";
 import {
 	createPiworkArtifactsTool,
+	createPiworkTitleTool,
 	piworkHomeTool,
 	piworkResourcesTool,
 } from "./piwork-tools";
@@ -116,6 +117,7 @@ export const createChatRunner = (options: {
 					customTools: [
 						piworkResourcesTool,
 						piworkHomeTool,
+						createPiworkTitleTool(chatId),
 						createPiworkArtifactsTool(chatId, {
 							onArtifactWrite: noteArtifactWrite,
 						}),
