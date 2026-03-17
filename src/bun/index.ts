@@ -1,4 +1,4 @@
-import { BrowserWindow, Updater } from "electrobun/bun";
+import { BrowserWindow, Updater, Utils } from "electrobun/bun";
 import type { UpdateStatusEntry } from "../shared/view-rpc";
 import { createAppInfoLoader, APP_NAME } from "./app-info";
 import { installApplicationMenu } from "./application-menu";
@@ -89,6 +89,12 @@ const mainWindow = new BrowserWindow({
 		height: 720,
 	},
 	titleBarStyle: "hiddenInset",
+});
+
+mainWindow.on("new-window-open", (event: any) => {
+	const detail = event?.data?.detail;
+	const url = typeof detail === "string" ? detail : detail?.url;
+	if (url) Utils.openExternal(url);
 });
 
 mainWindow.on("close", () => {

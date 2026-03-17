@@ -338,6 +338,10 @@ export interface PiworkViewRPCSchema {
 				params: {};
 				response: { ok: true };
 			};
+			openExternal: {
+				params: { url: string };
+				response: { ok: true };
+			};
 		};
 		messages: {};
 	};

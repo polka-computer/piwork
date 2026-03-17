@@ -207,6 +207,11 @@ export const createMainviewRpc = (options: {
 					await Updater.applyUpdate();
 					return { ok: true as const };
 				},
+
+				openExternal: async ({ url }) => {
+					Utils.openExternal(url);
+					return { ok: true as const };
+				},
 			},
 			messages: {},
 		},

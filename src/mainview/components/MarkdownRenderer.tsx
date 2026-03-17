@@ -6,6 +6,7 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github-dark-dimmed.css";
 import MermaidBlock from "./MermaidBlock";
+import { openExternalViaBun } from "../rpc";
 
 function isMermaid(className: string | undefined): boolean {
 	return /\blanguage-mermaid\b/.test(className || "");
@@ -21,6 +22,22 @@ export default function MarkdownRenderer({ content, className }: { content: stri
 					rehypeKatex,
 				]}
 				components={{
+					a({ href, children, ...props }) {
+						return (
+							<a
+								href={href}
+								{...props}
+								onClick={(e) => {
+									if (href) {
+										e.preventDefault();
+										openExternalViaBun(href);
+									}
+								}}
+							>
+								{children}
+							</a>
+						);
+					},
 					pre({ children, ...props }) {
 						const child = Array.isArray(children) ? children[0] : children;
 						if (

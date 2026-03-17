@@ -139,6 +139,10 @@ export const applyUpdateViaBun = async (): Promise<void> => {
 	await ensureBridge().request.applyUpdate({});
 };
 
+export const openExternalViaBun = async (url: string): Promise<void> => {
+	await ensureBridge().request.openExternal({ url });
+};
+
 export const getApiKeyStatusViaBun = async (): Promise<{ providers: ApiKeyProviderStatus[] }> =>
 	ensureBridge().request.getApiKeyStatus({});
 
