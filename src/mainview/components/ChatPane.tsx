@@ -44,13 +44,15 @@ export default function ChatPane({
 	onSubmit: (input: ComposerSubmitInput) => Promise<void>;
 }) {
 	const scrollRef = useRef<HTMLDivElement>(null);
-	const bottomRef = useRef<HTMLDivElement>(null);
 
 	const messageCount = activeChat?.messages.length ?? 0;
 	const lastMessageId = activeChat?.messages[messageCount - 1]?.id;
 
 	useEffect(() => {
-		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+		const el = scrollRef.current;
+		if (el) {
+			el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+		}
 	}, [lastMessageId, messageCount]);
 
 	return (
@@ -114,8 +116,7 @@ export default function ChatPane({
 							)}
 						</div>
 					)}
-					<div ref={bottomRef} />
-				</div>
+					</div>
 			</div>
 
 			<div className="shrink-0 border-t border-white/6 px-3 py-2">
