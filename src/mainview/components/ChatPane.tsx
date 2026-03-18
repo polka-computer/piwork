@@ -118,7 +118,7 @@ export default function ChatPane({
 				</div>
 			</div>
 
-			<div className="border-t border-white/6 px-3 py-2">
+			<div className="shrink-0 border-t border-white/6 px-3 py-2">
 				<div className="mx-auto max-w-[860px]">
 					{activeRuntimeActivity && (
 						<LiveRunPanel activity={activeRuntimeActivity} />

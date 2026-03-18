@@ -100,8 +100,8 @@ function AppInner() {
 						onArchiveCompletedChats={() => void app.handleArchiveCompletedChats()}
 					/>
 
-					<div className="flex min-w-0 flex-1">
-						<main className="flex min-w-0 flex-1 flex-col">
+					<div className="flex min-h-0 min-w-0 flex-1">
+						<main className="flex min-h-0 min-w-0 flex-1 flex-col">
 							<TopBar
 								activeView={app.state.activeView}
 								activeArtifact={app.activeArtifact}
