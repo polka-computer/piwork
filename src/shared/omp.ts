@@ -9,7 +9,7 @@ import { Effect, Schema } from "effect";
 import type { OmpErrorCode, OmpStreamEvent } from "./view-rpc";
 
 const LOG = "[piwork:omp]";
-const DEFAULT_TIMEOUT_MS = 120_000;
+const DEFAULT_TIMEOUT_MS = 0;
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 const MAX_TOTAL_ATTACHMENT_BYTES = 20 * 1024 * 1024;
 
@@ -129,6 +129,11 @@ const promptWithTimeout = async (
 	onTimeout: () => void,
 	timeoutMs: number,
 ): Promise<void> => {
+	if (timeoutMs <= 0) {
+		await prompt;
+		return;
+	}
+
 	let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
 	try {

@@ -108,7 +108,6 @@ export const createChatRunner = (options: {
 					sessionDir: join(PIWORK_SESSIONS_DIR, chatId, sessionKey),
 					cwd: PIWORK_ROOT_DIR,
 					allowEmptyResponse: true,
-					timeoutMs: 300_000,
 					modelRegistry: registry,
 					modelId,
 					attachmentPaths,
